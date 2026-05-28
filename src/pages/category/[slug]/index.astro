@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+import Navbar from '../../../components/Navbar.astro';
+import DramaCard from '../../../components/DramaCard.astro';
+
+import dramas from '../../../data/dramas.json';
+import { categories } from '../../../data/categories';
+
+export async function getStaticPaths() {
+
+  return categories.map((category) => ({
+
+    params: {
+      slug: category.slug
+    },
+
+    props: {
+      category
+    }
+
+  }));
+
+}
+
+const { category } = Astro.props;
+
+const filteredDramas = dramas.filter(
+  drama =>
+
+    category.slug === 'the-series-all'
+    ? true
+    : drama.category === category.slug
+);
+
+---
+
+<BaseLayout
+  title={category.title}
+  description={category.description}
+>
+
+  <Navbar />
+
+  <section class="category-hero">
+
+    <h1>
+      {category.name}
+    </h1>
+
+    <p>
+      {category.description}
+    </p>
+
+  </section>
+
+  <section class="category-content">
+
+    <div class="drama-grid">
+
+      {
+        filteredDramas.map(drama => (
+
+          <DramaCard
+            drama={drama}
+          />
+
+        ))
+      }
+
+    </div>
+
+  </section>
+
+</BaseLayout>
+
+<style>
+
+.category-hero{
+  text-align:center;
+  padding:80px 20px 40px;
+}
+
+.category-hero h1{
+  color:white;
+  font-size:48px;
+}
+
+.category-hero p{
+  color:#aaa;
+  max-width:900px;
+  margin:auto;
+  line-height:1.8;
+}
+
+.category-content{
+  max-width:1400px;
+  margin:auto;
+  padding:20px 20px 80px;
+}
+
+.drama-grid{
+  display:grid;
+  grid-template-columns:
+  repeat(auto-fill,minmax(220px,1fr));
+  gap:25px;
+}
+
+</style>

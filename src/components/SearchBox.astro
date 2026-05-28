@@ -1,0 +1,167 @@
+---
+import dramas from '../data/dramas.json';
+---
+
+<div class="search-box">
+
+  <input
+    id="searchInput"
+    type="text"
+    placeholder="ค้นหาซีรี่ย์..."
+  />
+
+  <div id="searchResults" class="results"></div>
+
+</div>
+
+<script define:vars={{ dramas }}>
+
+  const input = document.getElementById("searchInput");
+  const results = document.getElementById("searchResults");
+
+  input.addEventListener("input", () => {
+
+    const keyword = input.value.toLowerCase().trim();
+
+    results.innerHTML = "";
+
+    if (!keyword) {
+      results.style.display = "none";
+      return;
+    }
+
+    const filtered = dramas.filter((drama) => {
+
+      return (
+        drama.title?.toLowerCase().includes(keyword) ||
+        drama.title_th?.toLowerCase().includes(keyword)
+      );
+
+    });
+
+    if (filtered.length === 0) {
+
+      results.innerHTML = `
+        <div class="no-result">
+          ไม่พบซีรี่ย์
+        </div>
+      `;
+
+      results.style.display = "block";
+      return;
+    }
+
+    filtered.slice(0,10).forEach((drama) => {
+
+      results.innerHTML += `
+        <a href="/${drama.slug}" class="result-item">
+
+          <img src="${drama.poster}" />
+
+          <div class="info">
+            <h3>${drama.title}</h3>
+            <p>${drama.title_th || ""}</p>
+          </div>
+
+        </a>
+      `;
+
+    });
+
+    results.style.display = "block";
+
+  });
+
+  document.addEventListener("click", (e) => {
+
+    if (!e.target.closest(".search-box")) {
+      results.style.display = "none";
+    }
+
+  });
+
+</script>
+
+<style>
+
+.search-box{
+  width:100%;
+  max-width:700px;
+  margin:30px auto;
+  position:relative;
+}
+
+.search-box input{
+  width:100%;
+  height:58px;
+  background:#1a1a1a;
+  border:none;
+  outline:none;
+  border-radius:12px;
+  padding:0 20px;
+  color:white;
+  font-size:16px;
+}
+
+.results{
+  position:absolute;
+  top:70px;
+  left:0;
+  width:100%;
+  background:#161616;
+  border-radius:12px;
+  overflow:hidden;
+  display:none;
+  z-index:999;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+
+.result-item{
+  display:flex;
+  gap:15px;
+  padding:12px;
+  border-bottom:1px solid #222;
+}
+
+.result-item:hover{
+  background:#222;
+}
+
+.result-item img{
+  width:60px;
+  height:90px;
+  object-fit:cover;
+  border-radius:8px;
+}
+
+.result-item h3{
+  color:white;
+  font-size:15px;
+  margin-bottom:5px;
+}
+
+.result-item p{
+  color:#aaa;
+  font-size:13px;
+}
+
+.no-result{
+  padding:20px;
+  text-align:center;
+  color:#999;
+}
+
+@media(max-width:768px){
+
+  .results{
+    top:65px;
+  }
+
+  .result-item img{
+    width:50px;
+    height:75px;
+  }
+
+}
+
+</style>

@@ -1,0 +1,188 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+import Navbar from '../components/Navbar.astro';
+import SearchBox from '../components/SearchBox.astro';
+import DramaCard from '../components/DramaCard.astro';
+
+import dramas from '../data/dramas.json';
+---
+
+<BaseLayout
+ title="Wow-Drama ดูซีรี่ย์จีนพากย์ไทย | เว็บดูซีรี่ย์ออนไลน์ฟรี HD"
+  description="เว็บดูซีรี่ย์จีนพากย์ไทยและซับไทยครบทุกความสนุก รวมซีรี่ย์ใหม่ล่าสุดให้รับชมฟรีในคุณภาพระดับ HD มีทั้งซีรี่ย์เกาหลี ละครไทย และซีรี่ย์จากหลากหลายประเทศ อัปเดตใหม่ทุกวัน ดูง่ายไม่มีค่าใช้จ่าย รองรับการดูบนมือถือและคอมพิวเตอร์ เพลิดเพลินไปกับซีรี่ย์ที่คุณชื่นชอบได้ทุกที่ทุกเวลา!"
+>
+
+  <Navbar />
+
+  <section class="hero">
+
+    <h1>
+      ดูซีรี่ย์จีนพากย์ไทย | เว็บดูซีรี่ย์ออนไลน์คุณภาพ
+    </h1>
+
+    <p>หากคุณกำลังมองหาแหล่ง ดูซีรี่ย์จีนพากย์ไทย ที่ครบครันและอัปเดตตลอดเวลา WOW-DRAMA24 คือคำตอบ! เราได้รวบรวมซีรี่ย์ใหม่ๆ จากเอเชียมาไว้ที่นี่ ไม่ว่าจะเป็น ดูซีรี่ย์จีนพากย์ไทย, ดูซีรี่ย์จีนซับไทย, ละครไทยย้อนหลัง (ซีรี่ย์ไทย), รวมถึง ซีรี่ย์เกาหลี และซีรี่ย์ฮิตเรื่องใหม่ๆ ที่มาแรงในขณะนี้</p>
+
+<SearchBox />
+
+<section class="seo-content">
+
+  <h2>
+    ดูซีรี่ย์จีนพากย์ไทย ดูซีรี่ย์ออนไลน์ฟรี HD ครบทุกความสนุก
+  </h2>
+
+  <p>
+    ในยุคดิจิทัลปัจจุบัน การดูซีรี่ย์ออนไลน์กลายเป็นกิจกรรมที่หลายคนชื่นชอบ เนื่องจากความสะดวกสบายที่สามารถรับชมได้ทุกที่ทุกเวลา ไม่ต้องรอฉายทางโทรทัศน์อีกต่อไป และที่ WOW-DRAMA24 คุณสามารถเพลิดเพลินไปกับซีรี่ย์ที่หลากหลายจากหลายประเทศ รวมถึงการ ดูซีรี่ย์จีน ดูซีรี่ส์เกาหลี ดูซีรี่ย์จีนพากย์ไทย ดูซีรีส์ญี่ปุ่น ได้ทั้งแบบพากย์ไทยและซับไทย รวมไปถึง ละครไทยย้อนหลัง ซึ่งทั้งหมดนี้สามารถรับชมได้โดยไม่มีโฆษณาคั่น สร้างความสนุกสนานแบบไม่ขาดตอน
+  </p>
+
+  <p>
+    ซีรี่ย์มาใหม่ สำหรับคนที่ชอบ ดูซีรี่ย์จีนพากย์ไทย หรือคอซีรี่ย์จีนที่ต้องการดื่มด่ำกับเรื่องราวอันน่าประทับใจ WOW-DRAMA24 มีให้คุณเลือกชมหลากหลายประเภท ไม่ว่าจะเป็นซีรี่ย์ประวัติศาสตร์ ซีรี่ย์แนวโรแมนติก หรือซีรี่ย์แนวแอ็คชั่นที่กำลังเป็นที่นิยม ได้รวบรวมจากทุกแพลตฟอร์ม เช่น Netflix Viu Disney+ WeTV HBO iQiyi Monomax Youku และอื่นๆ ทั้งในรูปแบบพากย์ไทยและซับไทย คุณสามารถเลือกดูได้ตามความต้องการ ด้วยความคมชัดระดับ Full HD ที่รับรองว่าจะทำให้คุณเต็มอิ่มกับทุกฉากที่สำคัญ
+  </p>
+
+  <p>
+    พร้อมดูซีรี่ย์แล้วหรือยัง? หากคุณพร้อมแล้ว เข้ามารับชม ดูซีรี่ย์จีนพากย์ไทย และซีรี่ย์อื่นๆ อีกมากมายได้ทันทีที่ WOW-DRAMA24 เราขอส่งมอบความสนุกแบบจัดเต็มให้คุณได้สัมผัสกับประสบการณ์ดูซีรี่ย์ออนไลน์ที่ดีที่สุด!
+  </p>
+
+</section>
+
+  <section class="latest-section">
+
+    <div class="section-header">
+
+      <h2>
+        ซีรี่ย์อัพเดทล่าสุด
+      </h2>
+
+    </div>
+
+    <div class="drama-grid">
+
+      {
+        dramas.map(drama => (
+
+          <DramaCard
+            drama={drama}
+          />
+
+        ))
+      }
+
+    </div>
+
+  </section>
+
+</BaseLayout>
+
+<style>
+
+.hero{
+  width:100%;
+  min-height:60vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:60px 20px;
+}
+
+.hero h1{
+  font-size:56px;
+  margin-bottom:20px;
+  color:white;
+}
+
+.hero p{
+  font-size:20px;
+  color:#aaa;
+  max-width:700px;
+  line-height:1.8;
+}
+
+.latest-section{
+  width:100%;
+  max-width:1400px;
+  margin:auto;
+  padding:40px 20px 80px;
+}
+
+.section-header{
+  margin-bottom:30px;
+}
+
+.section-header h2{
+  font-size:32px;
+  color:white;
+}
+
+.drama-grid{
+  display:grid;
+  grid-template-columns:
+  repeat(auto-fill,minmax(220px,1fr));
+  gap:25px;
+}
+
+@media(max-width:768px){
+
+  .hero{
+    min-height:auto;
+    padding:40px 20px;
+  }
+
+  .hero h1{
+    font-size:36px;
+  }
+
+  .hero p{
+    font-size:16px;
+  }
+
+  .section-header h2{
+    font-size:24px;
+  }
+
+  .drama-grid{
+    grid-template-columns:
+    repeat(2,1fr);
+
+    gap:15px;
+  }
+
+}
+.seo-content{
+  max-width:1000px;
+  margin:40px auto 60px;
+  padding:0 20px;
+  color:#ccc;
+  line-height:1.9;
+}
+
+.seo-content h2{
+  font-size:32px;
+  margin-bottom:20px;
+  color:white;
+  text-align:center;
+}
+
+.seo-content p{
+  margin-bottom:20px;
+  font-size:17px;
+}
+
+@media(max-width:768px){
+
+  .seo-content{
+    margin-top:20px;
+  }
+
+  .seo-content h2{
+    font-size:24px;
+    line-height:1.5;
+  }
+
+  .seo-content p{
+    font-size:15px;
+  }
+
+}
+</style>

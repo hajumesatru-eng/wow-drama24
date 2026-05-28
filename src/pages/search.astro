@@ -1,0 +1,21 @@
+---
+import dramas from "../data/dramas.json";
+
+const url = new URL(Astro.request.url);
+const q = url.searchParams.get("q")?.toLowerCase() || "";
+
+const results = dramas.filter(d =>
+  d.title.toLowerCase().includes(q)
+);
+---
+
+<h1>Search: {q}</h1>
+
+<div class="grid">
+  {results.map(d => (
+    <a href={`/drama/${d.slug}`}>
+      <img src={d.poster} />
+      <p>{d.title}</p>
+    </a>
+  ))}
+</div>

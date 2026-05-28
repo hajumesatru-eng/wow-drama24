@@ -1,0 +1,341 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import dramas from '../data/dramas.json';
+
+export function getStaticPaths() {
+  return dramas.map((drama) => ({
+    params: { slug: drama.slug },
+    props: { drama }
+  }));
+}
+
+const { drama } = Astro.props;
+
+// FIX aman biar tidak undefined error
+const episodes = Array.isArray(drama?.episodes) ? drama.episodes : [];
+
+const firstEpisode =
+  episodes.length > 0
+    ? episodes[0].url
+    : drama?.servers?.backup ?? "";
+---
+
+<BaseLayout
+  title={`ดูซีรี่ส์จีน ${drama.title} (${drama.year}) ${drama.title_th} พากย์ไทย ตอนที่ 1-${drama.episodes?.length} จบ`}
+  description={`${drama.overview}`}
+>
+    <Navbar />
+  <div class="container">
+
+    <div class="backdrop">
+      <img src={drama?.backdrop} alt="" />
+    </div>
+
+    <div class="info">
+      <img class="poster" src={drama?.poster} alt="" />
+
+      <div>
+        <h1>
+  ดูซีรี่ส์จีน {drama?.title}
+  ({drama?.year})
+  {drama?.title_th}
+  พากย์ไทย
+</h1>
+        <p>{drama?.overview}</p>
+        <p>Episodes: {episodes.length}</p>
+        <p>Year: {drama?.year}</p>
+      </div>
+    </div>
+<div class="ad-top desktop-only">
+
+  <script is:inline>
+    atOptions = {
+      'key' : '2d751854ce36e13fefddaa58f93251e2',
+      'format' : 'iframe',
+      'height' : 90,
+      'width' : 728,
+      'params' : {}
+    };
+  </script>
+
+  <script
+    is:inline
+    src="https://buffcasualwhine.com/2d751854ce36e13fefddaa58f93251e2/invoke.js">
+  </script>
+
+</div>
+    <div class="player">
+      <iframe
+        id="videoPlayer"
+        src={firstEpisode}
+        width="100%"
+        height="500"
+        allowfullscreen
+      ></iframe>
+    </div>
+    <!-- TELEGRAM CTA -->
+
+<div class="telegram-box">
+
+  <p>
+    เข้าร่วม Telegram ของเรา
+    เพื่ออัปเดตซีรี่ย์ใหม่ล่าสุดก่อนใคร
+  </p>
+
+  <a
+    href="https://t.me/+w-wYednLnHE1NWI9"
+    target="_blank"
+    class="telegram-btn"
+  >
+    เข้าร่วมช่อง Telegram
+  </a>
+
+</div>
+<div class="ad-middle">
+
+  <script is:inline>
+    atOptions = {
+      'key' : '53541ca00eed825e8c431c12f7418ac0',
+      'format' : 'iframe',
+      'height' : 250,
+      'width' : 300,
+      'params' : {}
+    };
+  </script>
+
+  <script
+    is:inline
+    src="https://buffcasualwhine.com/53541ca00eed825e8c431c12f7418ac0/invoke.js">
+  </script>
+
+</div>
+    <div class="episodes">
+      <h2>Episode List</h2>
+
+      <div class="grid">
+        {episodes.map((ep) => (
+          <button class="ep-btn" data-url={ep.url}>
+            {ep.number}
+          </button>
+        ))}
+      </div>
+    </div>
+
+  </div>
+
+  <script is:inline>
+    const player = document.getElementById("videoPlayer");
+
+    document.querySelectorAll(".ep-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const url = btn.getAttribute("data-url");
+        if (player && url) {
+          player.src = url;
+        }
+      });
+    });
+  </script>
+
+  <style>
+    .container { max-width: 1100px; margin: auto; padding: 20px; }
+
+    .backdrop img { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; }
+
+    .info { display: flex; gap: 20px; margin-top: 20px; }
+
+    .poster { width: 180px; border-radius: 10px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+    }
+
+    .ep-btn {
+      padding: 10px;
+      background: #222;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .ep-btn:hover { background: #444; }
+    .ad-top{
+  display:flex;
+  justify-content:center;
+  margin:25px 0;
+}
+
+.ad-middle{
+  display:flex;
+  justify-content:center;
+  margin:35px 0;
+}
+
+.floating-left{
+  position:fixed;
+  left:10px;
+  top:120px;
+  z-index:50;
+}
+
+.floating-right{
+  position:fixed;
+  right:10px;
+  top:120px;
+  z-index:50;
+}
+
+.mobile-sticky{
+  display:none;
+}
+
+@media(max-width:1400px){
+
+  .floating-left,
+  .floating-right{
+    display:none;
+  }
+
+}
+
+@media(max-width:768px){
+
+  .desktop-only{
+    display:none;
+  }
+
+  .mobile-sticky{
+    display:flex;
+    justify-content:center;
+
+    position:fixed;
+    bottom:0;
+    left:0;
+
+    width:100%;
+
+    background:#111;
+
+    padding:5px 0;
+
+    z-index:999999;
+  }
+
+  body{
+    padding-bottom:70px;
+  }
+
+}
+/* TELEGRAM CTA */
+
+.telegram-box{
+  margin:30px auto;
+  padding:30px 20px;
+  background:#161616;
+  border-radius:16px;
+  text-align:center;
+  border:1px solid #222;
+}
+
+.telegram-box p{
+  color:#ccc;
+  font-size:18px;
+  margin-bottom:20px;
+  line-height:1.7;
+}
+
+.telegram-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:52px;
+  padding:0 30px;
+  background:#229ED9;
+  color:white;
+  border-radius:12px;
+  font-weight:700;
+  font-size:16px;
+  transition:.2s;
+}
+
+.telegram-btn:hover{
+  transform:translateY(-2px);
+  opacity:.9;
+}
+
+@media(max-width:768px){
+
+  .telegram-box{
+    padding:25px 15px;
+  }
+
+  .telegram-box p{
+    font-size:15px;
+  }
+
+  .telegram-btn{
+    width:100%;
+    height:50px;
+    font-size:15px;
+  }
+
+}
+  </style>
+  <div class="floating-left desktop-only">
+
+  <script is:inline>
+    atOptions = {
+      'key' : 'e132c6412476f3cc77d11b3519cd21b9',
+      'format' : 'iframe',
+      'height' : 600,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+
+  <script
+    is:inline
+    src="https://buffcasualwhine.com/e132c6412476f3cc77d11b3519cd21b9/invoke.js">
+  </script>
+
+</div>
+<div class="floating-right desktop-only">
+
+  <script is:inline>
+    atOptions = {
+      'key' : 'e132c6412476f3cc77d11b3519cd21b9',
+      'format' : 'iframe',
+      'height' : 600,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+
+  <script
+    is:inline
+    src="https://buffcasualwhine.com/e132c6412476f3cc77d11b3519cd21b9/invoke.js">
+  </script>
+
+</div>
+<div class="mobile-sticky">
+
+  <script is:inline>
+    atOptions = {
+      'key' : '113942e911746c421f6b5497bf65a2c6',
+      'format' : 'iframe',
+      'height' : 50,
+      'width' : 320,
+      'params' : {}
+    };
+  </script>
+
+  <script
+    is:inline
+    src="https://buffcasualwhine.com/113942e911746c421f6b5497bf65a2c6/invoke.js">
+  </script>
+
+</div>
+</BaseLayout>

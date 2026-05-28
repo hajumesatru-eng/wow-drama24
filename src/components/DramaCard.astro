@@ -1,0 +1,94 @@
+---
+const { drama } = Astro.props;
+---
+
+<a
+  href={`/${drama.slug}/`}
+  class="drama-card"
+>
+
+  <div class="poster-wrap">
+
+    <img
+      src={drama.poster}
+      alt={drama.title}
+      loading="lazy"
+    />
+
+  </div>
+
+  <div class="card-content">
+
+    <h3>
+      {drama.title}
+    </h3>
+
+    <p class="year">
+      {drama.year}
+    </p>
+
+  </div>
+
+</a>
+
+<style>
+
+.drama-card{
+  display:block;
+  width:100%;
+  text-decoration:none;
+  color:white;
+  background:#151515;
+  border-radius:14px;
+  overflow:hidden;
+  transition:0.3s;
+  border:1px solid #222;
+}
+
+.drama-card:hover{
+  transform:translateY(-5px);
+  border-color:#444;
+}
+
+.poster-wrap{
+  width:100%;
+  aspect-ratio:2/3;
+  overflow:hidden;
+  background:#111;
+}
+
+.poster-wrap img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  transition:0.3s;
+}
+
+.drama-card:hover img{
+  transform:scale(1.05);
+}
+
+.card-content{
+  padding:15px;
+}
+
+.card-content h3{
+  margin:0;
+  font-size:16px;
+  line-height:1.5;
+  color:white;
+
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+.year{
+  margin-top:8px;
+  font-size:14px;
+  color:#999;
+}
+
+</style>
