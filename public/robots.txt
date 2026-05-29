@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://wow-drama24.page.dev/sitemap-index.xml
+Sitemap: https://wow-drama24.pages.dev/sitemap-index.xml
