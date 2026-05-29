@@ -1,6 +1,6 @@
 import dramas from "../data/dramas.json";
 
-const SITE = "https://wow-drama24.page.dev";
+const SITE = "https://wow-drama24.pages.dev";
 
 function escapeXml(str = "") {
   return str
