@@ -1,0 +1,84 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navbar from "../../components/Navbar.astro";
+import SearchBox from "../../components/SearchBox.astro";
+import DramaCard from "../../components/DramaCard.astro";
+
+import dramas from "../../data/dramas.json";
+
+/* =========================
+   STATIC PATHS
+   ========================= */
+export function getStaticPaths() {
+  const PER_PAGE = 15;
+
+  const totalPages = Math.ceil(dramas.length / PER_PAGE);
+
+  return Array.from({ length: totalPages }).map((_, i) => ({
+    params: { page: String(i + 1) },
+  }));
+}
+
+/* =========================
+   PAGE LOGIC
+   ========================= */
+const PER_PAGE = 15;
+
+const page = Number(Astro.params.page ?? "1");
+
+const totalPages = Math.ceil(dramas.length / PER_PAGE);
+
+const safePage = Math.min(Math.max(page, 1), totalPages);
+
+const start = (safePage - 1) * PER_PAGE;
+const end = start + PER_PAGE;
+
+const paginated = dramas.slice(start, end);
+---
+
+<BaseLayout
+  title={`Page ${safePage} | ดูซีรี่ย์จีนพากย์ไทย | เว็บดูซีรี่ย์ออนไลน์ฟรี HD`}
+  description="สำหรับคนที่ชื่นชอบ ดูซีรี่ย์ออนไลน์ วันนี้เรามีซีรี่ย์เรื่องใหม่ๆ มาให้รับชมกันแบเต็มเรื่อง (ครบทุกตอน) ทั้งซีรี่ย์จีนพากย์ไทย และซีรี่ย์จีนซับไทย ละครไทยย้อนหลัง (ซีรี่ย์ไทย) และยังมีซีรี่ย์เกาหลี ซีรี่ย์ฮิตติดกระแส หรือซีรี่ญี่ปุ่นเราก็มี ทั้งหมดนี้ดูได้ที่นี้เลย!"
+  canonical={`https://wow-drama24.page.dev/page/${safePage}`}
+>
+<div class="container">
+
+  <Navbar />
+  <SearchBox />
+
+  <section class="hero">
+    <h1>Drama Page {safePage}</h1>
+  </section>
+
+  <section class="latest-section">
+
+    <div class="drama-grid">
+      {paginated.map((drama) => (
+        <DramaCard drama={drama} />
+      ))}
+    </div>
+
+    <div class="pagination">
+
+      {safePage > 1 && (
+        <a href={`/page/${safePage - 1}`}>Prev</a>
+      )}
+
+      {Array.from({ length: totalPages }).map((_, i) => {
+        const p = i + 1;
+        return (
+          <a href={`/page/${p}`} class={safePage === p ? "active" : ""}>
+            {p}
+          </a>
+        );
+      })}
+
+      {safePage < totalPages && (
+        <a href={`/page/${safePage + 1}`}>Next</a>
+      )}
+
+    </div>
+
+  </section>
+
+</BaseLayout>

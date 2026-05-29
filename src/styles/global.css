@@ -124,3 +124,61 @@ body{
     justify-content:center;
   }
 }
+.drama-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap:20px;
+  align-items: start;
+}
+/* CENTER PAGE CONTENT */
+.container{
+  width:100%;
+  max-width:1200px;
+  margin:auto;
+  padding:0 20px;
+}
+
+/* BIAR SEMUA SECTION RAPI & CENTER */
+.hero,
+.latest-section,
+.seo-links,
+.seo-content{
+  width:100%;
+}
+
+/* GRID FIX BIAR TIDAK MELEBAR BERLEBIH */
+.drama-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap:20px;
+  align-items:start;
+}
+
+/* OPTIONAL: rapihin spacing antar section */
+.latest-section,
+.seo-links,
+.seo-content{
+  margin-top:40px;
+}
+.latest-section{
+  width:100%;
+}
+
+.pagination{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-top:30px;
+  flex-wrap:wrap;
+}
+
+.pagination a{
+  padding:6px 10px;
+  background:#151515;
+  border:1px solid #222;
+  border-radius:6px;
+  color:white;
+}
+.pagination a.active{
+  background:#e50914;
+}

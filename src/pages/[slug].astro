@@ -25,6 +25,18 @@ const firstEpisode =
   title={`ดูซีรี่ส์จีน ${drama.title} (${drama.year}) ${drama.title_th} พากย์ไทย ตอนที่ 1-${drama.episodes?.length} จบ`}
   description={`${drama.overview}`}
 >
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "TVSeries",
+  "name": drama.title,
+  "image": drama.poster,
+  "description": drama.description || drama.title,
+  "url": `https://wow-drama24.page.dev/drama/${drama.slug}`,
+  "genre": "Drama",
+  "inLanguage": "th"
+})}
+</script>
     <Navbar />
   <div class="container">
 
@@ -283,6 +295,20 @@ const firstEpisode =
   }
 
 }
+.bottom-ad{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:40px auto;
+  overflow:hidden;
+}
+
+@media(max-width:768px){
+  .bottom-ad{
+    transform:scale(.85);
+    transform-origin:center;
+  }
+}
   </style>
   <div class="floating-left desktop-only">
 
@@ -338,4 +364,25 @@ const firstEpisode =
   </script>
 
 </div>
+
+<!-- BOTTOM ADS -->
+<div class="bottom-ad">
+
+  <script is:inline>
+    atOptions = {
+      'key' : 'ee6fbbaee01d7a12aeeb5d58f3126e1f',
+      'format' : 'iframe',
+      'height' : 60,
+      'width' : 468,
+      'params' : {}
+    };
+  </script>
+
+  <script
+    is:inline
+    src="https://buffcasualwhine.com/ee6fbbaee01d7a12aeeb5d58f3126e1f/invoke.js">
+  </script>
+
+</div>
+
 </BaseLayout>

@@ -32,29 +32,33 @@ const { drama } = Astro.props;
 </a>
 
 <style>
-
 .drama-card{
-  display:block;
+  display:flex;
+  flex-direction:column;
+  height:100%;
   width:100%;
   text-decoration:none;
   color:white;
   background:#151515;
   border-radius:14px;
   overflow:hidden;
-  transition:0.3s;
+  transition:0.25s;
   border:1px solid #222;
 }
 
+/* hover lebih smooth */
 .drama-card:hover{
   transform:translateY(-5px);
   border-color:#444;
 }
 
+/* FIX IMAGE AREA */
 .poster-wrap{
   width:100%;
   aspect-ratio:2/3;
   overflow:hidden;
   background:#111;
+  flex-shrink:0;
 }
 
 .poster-wrap img{
@@ -69,26 +73,34 @@ const { drama } = Astro.props;
   transform:scale(1.05);
 }
 
+/* FIX CONTENT BIAR SERAGAM */
 .card-content{
-  padding:15px;
+  padding:12px 12px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+
+  flex-grow:1;
 }
 
+/* TITLE */
 .card-content h3{
   margin:0;
-  font-size:16px;
-  line-height:1.5;
-  color:white;
+  font-size:15px;
+  line-height:1.4;
 
   display:-webkit-box;
   -webkit-line-clamp:2;
   -webkit-box-orient:vertical;
   overflow:hidden;
+
+  min-height:42px; /* 🔥 ini penting supaya tinggi sama */
 }
 
+/* YEAR */
 .year{
-  margin-top:8px;
-  font-size:14px;
+  margin:0;
+  font-size:13px;
   color:#999;
 }
-
 </style>

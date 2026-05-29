@@ -1,0 +1,174 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navbar from "../../components/Navbar.astro";
+import DramaCard from "../../components/DramaCard.astro";
+import dramas from "../../data/dramas.json";
+
+// =======================
+// ✅ WAJIB: getStaticPaths
+// =======================
+export async function getStaticPaths() {
+  return dramas.map((d) => ({
+    params: { slug: d.slug },
+    props: { drama: d },
+  }));
+}
+
+// ambil data dari props (bukan Astro.params lagi)
+const { drama } = Astro.props;
+
+// fallback description
+const description = drama.overview || drama.title;
+const metaTitle = `ดูซีรี่ส์จีน ${drama.title} (${drama.year})` +
+  (drama.title_th ? ` ${drama.title_th}` : "") +
+  ` พากย์ไทย (เต็มเรื่อง)`;
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={description}
+  image={drama.poster}
+  canonical={`https://wow-drama24.page.dev/drama/${drama.slug}/`}
+/>
+
+
+  <Navbar />
+
+  <!-- SEO Schema -->
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "TVSeries",
+      "name": drama.title,
+      "alternateName": drama.title_th,
+      "description": description,
+      "url": `https://wow-drama24.page.dev/drama/${drama.slug}`,
+      "image": {
+        "@type": "ImageObject",
+        "url": drama.poster,
+        "caption": drama.title
+      },
+      "genre": drama.category || "Drama",
+      "inLanguage": "th",
+      "publisher": {
+        "@type": "Organization",
+        "name": "WOW-DRAMA24"
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": `https://wow-drama24.page.dev/drama/${drama.slug}`
+      }
+    })}
+  </script>
+
+  <!-- CONTENT -->
+  <section class="drama-detail">
+    <div class="container">
+
+      <!-- POSTER -->
+      <div class="poster">
+        <img src={drama.poster} alt={drama.title} />
+      </div>
+
+      <!-- INFO -->
+      <div class="info">
+        <h1>{drama.title}</h1>
+
+        {drama.title_th && <h2>{drama.title_th}</h2>}
+
+        <p class="desc">{description}</p>
+
+        <p><strong>Year:</strong> {drama.year}</p>
+        <p><strong>Category:</strong> {drama.category}</p>
+
+        <a
+         class="watch-btn"
+         href={`/${drama.slug}/`}>
+         ▶ รับชมทุกตอน</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RELATED -->
+  <section class="related">
+    <h2>ซีรีส์เพิ่มเติม</h2>
+
+    <div class="grid">
+      {dramas
+        .filter((d) => d.slug !== drama.slug)
+        .slice(0, 6)
+        .map((item) => (
+          <DramaCard drama={item} />
+        ))}
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+.drama-detail{
+  padding:60px 20px;
+  color:white;
+}
+
+.container{
+  display:flex;
+  gap:40px;
+  max-width:1100px;
+  margin:auto;
+}
+
+.poster img{
+  width:300px;
+  border-radius:12px;
+}
+
+.info h1{
+  font-size:36px;
+  margin-bottom:10px;
+}
+
+.info h2{
+  font-size:20px;
+  color:#aaa;
+}
+
+.desc{
+  margin:20px 0;
+  color:#ccc;
+  line-height:1.8;
+}
+
+.watch-btn{
+  display:inline-block;
+  padding:12px 20px;
+  background:red;
+  color:white;
+  border-radius:8px;
+  margin-top:20px;
+  text-decoration:none;
+}
+
+.related{
+  max-width:1200px;
+  margin:auto;
+  padding:40px 20px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:20px;
+}
+
+@media(max-width:768px){
+  .container{
+    flex-direction:column;
+  }
+
+  .poster img{
+    width:100%;
+  }
+}
+</style>

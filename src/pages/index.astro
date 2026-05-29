@@ -1,30 +1,58 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Navbar from "../components/Navbar.astro";
+import SearchBox from "../components/SearchBox.astro";
+import DramaCard from "../components/DramaCard.astro";
+import dramas from "../data/dramas.json";
 
-import Navbar from '../components/Navbar.astro';
-import SearchBox from '../components/SearchBox.astro';
-import DramaCard from '../components/DramaCard.astro';
-
-import dramas from '../data/dramas.json';
+const PER_PAGE = 15;
+const latest = dramas.slice(0, PER_PAGE);
 ---
 
 <BaseLayout
- title="Wow-Drama ดูซีรี่ย์จีนพากย์ไทย | เว็บดูซีรี่ย์ออนไลน์ฟรี HD"
-  description="เว็บดูซีรี่ย์จีนพากย์ไทยและซับไทยครบทุกความสนุก รวมซีรี่ย์ใหม่ล่าสุดให้รับชมฟรีในคุณภาพระดับ HD มีทั้งซีรี่ย์เกาหลี ละครไทย และซีรี่ย์จากหลากหลายประเทศ อัปเดตใหม่ทุกวัน ดูง่ายไม่มีค่าใช้จ่าย รองรับการดูบนมือถือและคอมพิวเตอร์ เพลิดเพลินไปกับซีรี่ย์ที่คุณชื่นชอบได้ทุกที่ทุกเวลา!"
+  title="Wow-Drama24 ดูซีรี่ย์จีนพากย์ไทย | เว็บดูซีรี่ย์ออนไลน์ฟรี HD"
+  description="เว็บดูซีรี่ย์จีนพากย์ไทยและซับไทยครบทุกความสนุก รวมซีรี่ย์ใหม่ล่าสุดให้รับชมฟรีในคุณภาพระดับ HD มีทั้งซีรี่ย์เกาหลี ละครไทย และซีรี่ย์จากหลากหลายประเทศ อัปเดตใหม่ทุกวัน ดูง่ายไม่มีค่าใช้จ่าย รองรับการดูบนมือถือและคอมพิวเตอร์ เพลิดเพลินไปกับซีรี่ย์ที่คุณชื่นชอบได้ทุกที่ทุกเวลา"
+  canonical="https://wow-drama24.page.dev/"
 >
-
-  <Navbar />
-
-  <section class="hero">
-
-    <h1>
-      ดูซีรี่ย์จีนพากย์ไทย | เว็บดูซีรี่ย์ออนไลน์คุณภาพ
-    </h1>
-
-    <p>หากคุณกำลังมองหาแหล่ง ดูซีรี่ย์จีนพากย์ไทย ที่ครบครันและอัปเดตตลอดเวลา WOW-DRAMA24 คือคำตอบ! เราได้รวบรวมซีรี่ย์ใหม่ๆ จากเอเชียมาไว้ที่นี่ ไม่ว่าจะเป็น ดูซีรี่ย์จีนพากย์ไทย, ดูซีรี่ย์จีนซับไทย, ละครไทยย้อนหลัง (ซีรี่ย์ไทย), รวมถึง ซีรี่ย์เกาหลี และซีรี่ย์ฮิตเรื่องใหม่ๆ ที่มาแรงในขณะนี้</p>
-
+<div class="container">
+<Navbar />
 <SearchBox />
 
+<!-- HERO SEO -->
+<section class="hero">
+  <h1>ดูซีรี่ย์จีนพากย์ไทย | เว็บดูซีรี่ย์ออนไลน์คุณภาพ</h1>
+
+  <p>
+    หากคุณกำลังมองหาแหล่ง ดูซีรี่ย์จีนพากย์ไทย ที่ครบครันและอัปเดตตลอดเวลา WOW-DRAMA24 คือคำตอบ! เราได้รวบรวมซีรี่ย์ใหม่ๆ จากเอเชียมาไว้ที่นี่ ไม่ว่าจะเป็น ดูซีรี่ย์จีนพากย์ไทย, ดูซีรี่ย์จีนซับไทย, ละครไทยย้อนหลัง (ซีรี่ย์ไทย), รวมถึง ซีรี่ย์เกาหลี และซีรี่ย์ฮิตเรื่องใหม่ๆ ที่มาแรงในขณะนี้
+  </p>
+
+  <a href="/page/1" class="cta">
+    ดูซีรี่ย์ทั้งหมด →
+  </a>
+</section>
+
+<!-- LATEST -->
+<section class="latest-section">
+
+  <h2>🔥 ซีรี่ย์แนะนำล่าสุด</h2>
+
+  <div class="drama-grid">
+    {latest.map((drama) => (
+      <DramaCard drama={drama} />
+    ))}
+  </div>
+
+</section>
+
+<!-- SEO INTERNAL LINK BLOCK -->
+<section class="seo-links">
+  <h2>ดูซีรี่ย์ยอดนิยม</h2>
+
+  <ul>
+    <li><a href="/page/1">ซีรี่ย์ทั้งหมด (Page 1)</a></li>
+    <li><a href="/page/2">ซีรี่ย์มาใหม่</a></li>
+  </ul>
+</section>
 <section class="seo-content">
 
   <h2>
@@ -44,145 +72,44 @@ import dramas from '../data/dramas.json';
   </p>
 
 </section>
-
-  <section class="latest-section">
-
-    <div class="section-header">
-
-      <h2>
-        ซีรี่ย์อัพเดทล่าสุด
-      </h2>
-
-    </div>
-
-    <div class="drama-grid">
-
-      {
-        dramas.map(drama => (
-
-          <DramaCard
-            drama={drama}
-          />
-
-        ))
-      }
-
-    </div>
-
-  </section>
-
+<!-- JSON-LD SEO -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "WOW-DRAMA24",
+  "url": "https://wow-drama24.page.dev/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://wow-drama24.page.dev/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+})} />
+</div>
 </BaseLayout>
-
 <style>
-
-.hero{
-  width:100%;
-  min-height:60vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
+  .hero{
   text-align:center;
   padding:60px 20px;
 }
 
 .hero h1{
-  font-size:56px;
-  margin-bottom:20px;
-  color:white;
+  font-size:42px;
+  margin-bottom:15px;
 }
 
 .hero p{
-  font-size:20px;
-  color:#aaa;
   max-width:700px;
-  line-height:1.8;
-}
-
-.latest-section{
-  width:100%;
-  max-width:1400px;
   margin:auto;
-  padding:40px 20px 80px;
+  color:#bbb;
+  line-height:1.6;
 }
 
-.section-header{
-  margin-bottom:30px;
-}
-
-.section-header h2{
-  font-size:32px;
+.cta{
+  display:inline-block;
+  margin-top:20px;
+  padding:12px 20px;
+  background:#e50914;
   color:white;
-}
-
-.drama-grid{
-  display:grid;
-  grid-template-columns:
-  repeat(auto-fill,minmax(220px,1fr));
-  gap:25px;
-}
-
-@media(max-width:768px){
-
-  .hero{
-    min-height:auto;
-    padding:40px 20px;
-  }
-
-  .hero h1{
-    font-size:36px;
-  }
-
-  .hero p{
-    font-size:16px;
-  }
-
-  .section-header h2{
-    font-size:24px;
-  }
-
-  .drama-grid{
-    grid-template-columns:
-    repeat(2,1fr);
-
-    gap:15px;
-  }
-
-}
-.seo-content{
-  max-width:1000px;
-  margin:40px auto 60px;
-  padding:0 20px;
-  color:#ccc;
-  line-height:1.9;
-}
-
-.seo-content h2{
-  font-size:32px;
-  margin-bottom:20px;
-  color:white;
-  text-align:center;
-}
-
-.seo-content p{
-  margin-bottom:20px;
-  font-size:17px;
-}
-
-@media(max-width:768px){
-
-  .seo-content{
-    margin-top:20px;
-  }
-
-  .seo-content h2{
-    font-size:24px;
-    line-height:1.5;
-  }
-
-  .seo-content p{
-    font-size:15px;
-  }
-
+  border-radius:8px;
 }
 </style>

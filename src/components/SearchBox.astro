@@ -1,5 +1,5 @@
 ---
-import dramas from '../data/dramas.json';
+import dramas from "../data/dramas.json";
 ---
 
 <div class="search-box">
@@ -8,6 +8,7 @@ import dramas from '../data/dramas.json';
     id="searchInput"
     type="text"
     placeholder="ค้นหาซีรี่ย์..."
+    autocomplete="off"
   />
 
   <div id="searchResults" class="results"></div>
@@ -16,69 +17,112 @@ import dramas from '../data/dramas.json';
 
 <script define:vars={{ dramas }}>
 
-  const input = document.getElementById("searchInput");
-  const results = document.getElementById("searchResults");
+const input = document.getElementById("searchInput");
+const results = document.getElementById("searchResults");
 
-  input.addEventListener("input", () => {
+// ENTER SEARCH
+input.addEventListener("keydown", (e) => {
 
-    const keyword = input.value.toLowerCase().trim();
+  if (e.key === "Enter") {
 
-    results.innerHTML = "";
+    const keyword = input.value.trim();
 
-    if (!keyword) {
-      results.style.display = "none";
-      return;
-    }
+    if (!keyword) return;
 
-    const filtered = dramas.filter((drama) => {
+    window.location.href =
+      `/search?q=${encodeURIComponent(keyword)}`;
+  }
 
-      return (
-        drama.title?.toLowerCase().includes(keyword) ||
-        drama.title_th?.toLowerCase().includes(keyword)
-      );
+});
 
-    });
+// LIVE SEARCH
+input.addEventListener("input", () => {
 
-    if (filtered.length === 0) {
+  const keyword = input.value.toLowerCase().trim();
 
-      results.innerHTML = `
-        <div class="no-result">
-          ไม่พบซีรี่ย์
-        </div>
-      `;
+  results.innerHTML = "";
 
-      results.style.display = "block";
-      return;
-    }
+  if (!keyword) {
+    results.style.display = "none";
+    return;
+  }
 
-    filtered.slice(0,10).forEach((drama) => {
+  const filtered = dramas.filter((drama) => {
 
-      results.innerHTML += `
-        <a href="/${drama.slug}" class="result-item">
+  const title =
+    (drama.title || "").toLowerCase();
 
-          <img src="${drama.poster}" />
+  const titleTh =
+    (drama.title_th || "").toLowerCase();
 
-          <div class="info">
-            <h3>${drama.title}</h3>
-            <p>${drama.title_th || ""}</p>
-          </div>
+  const words = title.split(" ");
 
-        </a>
-      `;
+  return (
 
-    });
+    title.includes(keyword) ||
+
+    titleTh.includes(keyword) ||
+
+    words.some(word =>
+      word.startsWith(keyword)
+    )
+
+  );
+
+ });
+
+  if (filtered.length === 0) {
+
+    results.innerHTML = `
+      <div class="no-result">
+        ไม่พบซีรี่ย์
+      </div>
+    `;
 
     results.style.display = "block";
+    return;
+  }
+
+  filtered.slice(0, 5).forEach((drama) => {
+
+    results.innerHTML += `
+      <a href="/${drama.slug}" class="result-item">
+
+        <img
+  src="${drama.poster}"
+  alt="${drama.title}"
+  style="
+    width:50px;
+    height:75px;
+    min-width:50px;
+    max-width:50px;
+    object-fit:cover;
+    border-radius:6px;
+  "
+/>
+
+        <div class="info">
+          <h3>${drama.title}</h3>
+          <p>${drama.title_th || ""}</p>
+        </div>
+
+      </a>
+    `;
 
   });
 
-  document.addEventListener("click", (e) => {
+  results.style.display = "block";
 
-    if (!e.target.closest(".search-box")) {
-      results.style.display = "none";
-    }
+});
 
-  });
+// CLICK OUTSIDE
+document.addEventListener("click", (e) => {
+
+  if (!e.target.closest(".search-box")) {
+    results.style.display = "none";
+  }
+
+});
 
 </script>
 
@@ -108,19 +152,26 @@ import dramas from '../data/dramas.json';
   top:70px;
   left:0;
   width:100%;
+
+  max-height:450px;
+  overflow-y:auto;
+
   background:#161616;
   border-radius:12px;
-  overflow:hidden;
+
   display:none;
-  z-index:999;
+  z-index:99999;
+
   box-shadow:0 10px 30px rgba(0,0,0,.5);
 }
 
 .result-item{
   display:flex;
-  gap:15px;
-  padding:12px;
+  align-items:center;
+  gap:12px;
+  padding:10px;
   border-bottom:1px solid #222;
+  text-decoration:none;
 }
 
 .result-item:hover{
@@ -128,21 +179,31 @@ import dramas from '../data/dramas.json';
 }
 
 .result-item img{
-  width:60px;
-  height:90px;
+  width:50px !important;
+  height:75px !important;
+  min-width:50px !important;
+  max-width:50px !important;
+
   object-fit:cover;
-  border-radius:8px;
+  border-radius:6px;
+  display:block;
+}
+
+.result-item .info{
+  flex:1;
+  overflow:hidden;
 }
 
 .result-item h3{
-  color:white;
-  font-size:15px;
-  margin-bottom:5px;
+  margin:0;
+  font-size:14px;
+  color:#fff;
 }
 
 .result-item p{
+  margin-top:4px;
+  font-size:12px;
   color:#aaa;
-  font-size:13px;
 }
 
 .no-result{
@@ -158,8 +219,8 @@ import dramas from '../data/dramas.json';
   }
 
   .result-item img{
-    width:50px;
-    height:75px;
+    width:50px !important;
+    height:75px !important;
   }
 
 }

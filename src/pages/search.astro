@@ -1,21 +1,271 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Navbar from "../components/Navbar.astro";
+import SearchBox from "../components/SearchBox.astro";
 import dramas from "../data/dramas.json";
 
 const url = new URL(Astro.request.url);
-const q = url.searchParams.get("q")?.toLowerCase() || "";
 
-const results = dramas.filter(d =>
-  d.title.toLowerCase().includes(q)
-);
+const q = url.searchParams.get("q")?.trim() || "";
+
+const keyword = q.toLowerCase();
+
+// Similarity sederhana untuk typo
+function similarity(a: string, b: string): number {
+
+  a = a.toLowerCase();
+  b = b.toLowerCase();
+
+  let score = 0;
+
+  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+
+    if (a[i] === b[i]) {
+      score++;
+    }
+
+  }
+
+  return score / Math.max(a.length, b.length);
+}
+
+// HASIL PENCARIAN
+const results = dramas.filter((d) => {
+
+  return (
+    d.title?.toLowerCase().includes(keyword) ||
+    d.title_th?.toLowerCase().includes(keyword)
+  );
+
+});
+
+// TYPO SUGGESTION
+const suggestions = dramas
+  .map((d) => ({
+
+    ...d,
+
+    score: Math.max(
+      similarity(keyword, d.title || ""),
+      similarity(keyword, d.title_th || "")
+    )
+
+  }))
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 5);
 ---
 
-<h1>Search: {q}</h1>
+<BaseLayout
+  title={`Search: ${q} | WOW-DRAMA24`}
+  description={`Search results for ${q}`}
+>
+<Navbar />
 
-<div class="grid">
-  {results.map(d => (
-    <a href={`/drama/${d.slug}`}>
-      <img src={d.poster} />
-      <p>{d.title}</p>
-    </a>
-  ))}
-</div>
+<SearchBox />
+<section class="search-page">
+
+  <h1>
+    Search Results: "{q}"
+  </h1>
+
+  {results.length > 0 ? (
+
+    <div class="grid">
+
+      {results.map((d) => (
+
+        <a
+          href={`/drama/${d.slug}`}
+          class="card"
+        >
+
+          <img
+            src={d.poster}
+            alt={d.title}
+          />
+
+          <h3>{d.title}</h3>
+
+          {d.title_th && (
+            <p>{d.title_th}</p>
+          )}
+
+        </a>
+
+      ))}
+
+    </div>
+
+  ) : (
+
+    <div class="empty">
+
+  <h2>
+    ไม่พบผลลัพธ์สำหรับ "{q}"
+  </h2>
+
+  <p>
+    ลองค้นหาด้วยคำอื่น หรือกลับไปหน้าแรก
+  </p>
+
+  <a href="/" class="home-btn">
+    🏠 กลับหน้าแรก
+  </a>
+
+      {suggestions.length > 0 && (
+
+        <>
+          <p class="maybe">
+            Maybe you mean:
+          </p>
+
+          <div class="suggestions">
+
+            {suggestions.map((d) => (
+
+              <a
+                href={`/drama/${d.slug}`}
+                class="suggestion-item"
+              >
+
+                <img
+                  src={d.poster}
+                  alt={d.title}
+                />
+
+                <div>
+
+                  <strong>
+                    {d.title}
+                  </strong>
+
+                  {d.title_th && (
+                    <p>{d.title_th}</p>
+                  )}
+
+                </div>
+
+              </a>
+
+            ))}
+
+          </div>
+
+        </>
+
+      )}
+
+    </div>
+
+  )}
+
+</section>
+
+</BaseLayout>
+
+<style>
+
+.search-page{
+  max-width:1200px;
+  margin:auto;
+  padding:40px 20px;
+  color:white;
+}
+
+.search-page h1{
+  margin-bottom:30px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:
+  repeat(auto-fill,minmax(180px,1fr));
+  gap:20px;
+}
+
+.card{
+  text-decoration:none;
+}
+
+.card img{
+  width:100%;
+  border-radius:10px;
+}
+
+.card h3{
+  color:white;
+  margin-top:10px;
+}
+
+.card p{
+  color:#aaa;
+}
+
+.empty{
+  margin-top:30px;
+}
+
+.maybe{
+  margin-top:20px;
+  margin-bottom:20px;
+  color:#aaa;
+}
+
+.suggestions{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.suggestion-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:#161616;
+  padding:10px;
+  border-radius:10px;
+  color:white;
+  transition:.2s;
+}
+
+.suggestion-item:hover{
+  background:#222;
+}
+
+.suggestion-item img{
+  width:50px;
+  height:75px;
+  object-fit:cover;
+  border-radius:6px;
+}
+
+.suggestion-item p{
+  color:#999;
+  font-size:13px;
+  margin-top:4px;
+}
+
+@media(max-width:768px){
+
+  .grid{
+    grid-template-columns:
+    repeat(2,1fr);
+  }
+
+}
+.home-btn{
+  display:inline-block;
+  margin-top:20px;
+  padding:12px 20px;
+
+  background:#e50914;
+  color:white;
+
+  border-radius:8px;
+  font-weight:bold;
+}
+
+.home-btn:hover{
+  opacity:.9;
+}
+</style>
