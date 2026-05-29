@@ -32,7 +32,16 @@ const filteredDramas = dramas.filter(
     ? true
     : drama.category === category.slug
 );
+const PER_PAGE = 10;
 
+const totalPages = Math.ceil(
+  filteredDramas.length / PER_PAGE
+);
+
+const firstPage = filteredDramas.slice(
+  0,
+  PER_PAGE
+);
 ---
 
 <BaseLayout
@@ -59,7 +68,7 @@ const filteredDramas = dramas.filter(
     <div class="drama-grid">
 
       {
-        filteredDramas.map(drama => (
+        firstPage.map(drama => (
 
           <DramaCard
             drama={drama}
@@ -69,7 +78,15 @@ const filteredDramas = dramas.filter(
       }
 
     </div>
-
+{
+  totalPages > 1 && (
+    <div class="pagination">
+      <a href={`/category/${category.slug}/page/2`}>
+        Next →
+      </a>
+    </div>
+  )
+}
   </section>
 
 </BaseLayout>
