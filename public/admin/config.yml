@@ -2,7 +2,6 @@ backend:
   name: github
   repo: hajumesatru-eng/wow-drama24
   branch: main
-  auth_scope: repo
 
 media_folder: "public/images"
 public_folder: "/images"
@@ -10,6 +9,8 @@ public_folder: "/images"
 collections:
   - name: "dramas"
     label: "Drama List"
+    format: "json"
+    extension: json
     files:
       - file: "src/data/dramas.json"
         label: "Dramas"
