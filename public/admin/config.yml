@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: USERNAME/wow-drama24
+  repo: hajumesatru-eng/wow-drama24
   branch: main
   auth_scope: repo
 
