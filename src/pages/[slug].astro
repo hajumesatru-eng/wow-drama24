@@ -2,316 +2,331 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Navbar from '../components/Navbar.astro';
 import dramas from '../data/dramas.json';
+import episodesData from "../data/episodes.json";
 
+// ✅ WAJIB UNTUK ASTRO STATIC ROUTE
 export function getStaticPaths() {
-  return dramas.map((drama) => ({
-    params: { slug: drama.slug },
-    props: { drama }
+  return dramas.map((d) => ({
+    params: { slug: d.slug }
   }));
 }
 
-const { drama } = Astro.props;
+const { slug } = Astro.params;
 
-// FIX aman biar tidak undefined error
-const episodes = Array.isArray(drama?.episodes) ? drama.episodes : [];
+const drama = dramas.find(d => d.slug === slug);
+const episodeData = episodesData.find(e => e.slug === slug);
 
-const firstEpisode =
-  episodes.length > 0
-    ? episodes[0].url
-    : drama?.servers?.backup ?? "";
+const episodes = episodeData?.episodes ?? [];
+const firstEpisode = episodes[0]?.url ?? "";
+
+if (!drama) {
+  return Astro.redirect("/404");
+}
 ---
 
 <BaseLayout
-  title={`ดูซีรี่ส์จีน ${drama.title} (${drama.year}) ${drama.title_th} พากย์ไทย ตอนที่ 1-${drama.episodes?.length} จบ`}
-  description={`${drama.overview}`}
+  title={`ดูซีรี่ส์จีน ${drama.title} (${drama.year}) ${drama.title_th} พากย์ไทย ตอนที่ 1-${episodes.length} จบ`}
+  description={drama.overview}
 >
+
+<!-- SEO -->
 <script type="application/ld+json">
 {JSON.stringify({
   "@context": "https://schema.org",
   "@type": "TVSeries",
   "name": drama.title,
   "image": drama.poster,
-  "description": drama.description || drama.title,
+  "description": drama.overview,
   "url": `https://wow-drama24.pages.dev/drama/${drama.slug}`,
   "genre": "Drama",
   "inLanguage": "th"
 })}
 </script>
-    <Navbar />
-  <div class="container">
 
-    <div class="backdrop">
-      <img src={drama?.backdrop} alt="" />
-    </div>
+<Navbar />
 
-    <div class="info">
-      <img class="poster" src={drama?.poster} alt="" />
+<div class="container">
 
-      <div>
-        <h1>
-  ดูซีรี่ส์จีน {drama?.title}
-  ({drama?.year})
-  {drama?.title_th}
-  พากย์ไทย
-</h1>
-        <p>{drama?.overview}</p>
-        <p>Episodes: {episodes.length}</p>
-        <p>Year: {drama?.year}</p>
-      </div>
-    </div>
-<div class="ad-top desktop-only">
-
-  <script is:inline>
-    atOptions = {
-      'key' : '2d751854ce36e13fefddaa58f93251e2',
-      'format' : 'iframe',
-      'height' : 90,
-      'width' : 728,
-      'params' : {}
-    };
-  </script>
-
-  <script
-    is:inline
-    src="https://buffcasualwhine.com/2d751854ce36e13fefddaa58f93251e2/invoke.js">
-  </script>
-
-</div>
-    <div class="player">
-      <iframe
-        id="videoPlayer"
-        src={firstEpisode}
-        width="100%"
-        height="500"
-        allowfullscreen
-      ></iframe>
-    </div>
-    <!-- TELEGRAM CTA -->
-
-<div class="telegram-box">
-
-  <p>
-    เข้าร่วม Telegram ของเรา
-    เพื่ออัปเดตซีรี่ย์ใหม่ล่าสุดก่อนใคร
-  </p>
-
-  <a
-    href="https://t.me/+w-wYednLnHE1NWI9"
-    target="_blank"
-    class="telegram-btn"
-  >
-    เข้าร่วมช่อง Telegram
-  </a>
-
-</div>
-<div class="ad-middle">
-
-  <script is:inline>
-    atOptions = {
-      'key' : '53541ca00eed825e8c431c12f7418ac0',
-      'format' : 'iframe',
-      'height' : 250,
-      'width' : 300,
-      'params' : {}
-    };
-  </script>
-
-  <script
-    is:inline
-    src="https://buffcasualwhine.com/53541ca00eed825e8c431c12f7418ac0/invoke.js">
-  </script>
-
-</div>
-    <div class="episodes">
-      <h2>Episode List</h2>
-
-      <div class="grid">
-        {episodes.map((ep) => (
-          <button class="ep-btn" data-url={ep.url}>
-            {ep.number}
-          </button>
-        ))}
-      </div>
-    </div>
-
+  <!-- BACKDROP -->
+  <div class="backdrop">
+    <img src={drama.backdrop} alt={drama.title} />
   </div>
 
-  <script is:inline>
-    const player = document.getElementById("videoPlayer");
+  <!-- INFO -->
+  <div class="info">
+    <img class="poster" src={drama.poster} alt={drama.title} />
 
-    document.querySelectorAll(".ep-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const url = btn.getAttribute("data-url");
-        if (player && url) {
-          player.src = url;
-        }
-      });
+    <div>
+      <h1>
+        ดูซีรี่ส์จีน {drama.title} ({drama.year}) {drama.title_th} พากย์ไทย EP.1-{episodes.length} จบ
+      </h1>
+
+      <p>{drama.genre}</p>
+      <p>Episodes: {episodes.length}</p>
+      <p>Year: {drama.year}</p>
+    </div>
+  </div>
+
+  <!-- AD TOP -->
+  <div class="ad-top desktop-only">
+    <script is:inline>
+      atOptions = {
+        'key' : '2d751854ce36e13fefddaa58f93251e2',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+
+    <script is:inline src="https://buffcasualwhine.com/2d751854ce36e13fefddaa58f93251e2/invoke.js"></script>
+  </div>
+
+  <!-- PLAYER -->
+  <div class="player">
+    <iframe
+      id="videoPlayer"
+      src={firstEpisode}
+      width="100%"
+      height="500"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <!-- TELEGRAM -->
+  <div class="telegram-box">
+    <p>เข้าร่วม Telegram ของเรา เพื่ออัปเดตซีรี่ย์ใหม่ล่าสุดก่อนใคร</p>
+
+    <a
+      href="https://t.me/+w-wYednLnHE1NWI9"
+      target="_blank"
+      class="telegram-btn"
+    >
+      เข้าร่วมช่อง Telegram
+    </a>
+  </div>
+
+  <!-- AD MIDDLE -->
+  <div class="ad-middle">
+    <script is:inline>
+      atOptions = {
+        'key' : '53541ca00eed825e8c431c12f7418ac0',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    </script>
+
+    <script is:inline src="https://buffcasualwhine.com/53541ca00eed825e8c431c12f7418ac0/invoke.js"></script>
+  </div>
+    <div>
+      <h2>
+        ดูซีรี่ส์จีน {drama.title} ({drama.year}) {drama.title_th} พากย์ไทย
+      </h2>
+      <p>{drama.overview}</p>
+    </div
+  <!-- EPISODES -->
+  <div class="episodes">
+    <h2>Episode List</h2>
+
+    <div class="grid">
+      {episodes.map((ep) => (
+        <button class="ep-btn" data-url={ep.url}>
+          {ep.number}
+        </button>
+      ))}
+    </div>
+  </div>
+
+</div>
+
+<!-- PLAYER SCRIPT -->
+<script is:inline>
+  const player = document.getElementById("videoPlayer");
+
+  document.querySelectorAll(".ep-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const url = btn.getAttribute("data-url");
+      if (player && url) {
+        player.src = url;
+      }
     });
-  </script>
+  });
+</script>
 
-  <style>
-    .container { max-width: 1100px; margin: auto; padding: 20px; }
-
-    .backdrop img { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; }
-
-    .info { display: flex; gap: 20px; margin-top: 20px; }
-
-    .poster { width: 180px; border-radius: 10px; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-      gap: 10px;
-    }
-
-    .ep-btn {
-      padding: 10px;
-      background: #222;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .ep-btn:hover { background: #444; }
-    .ad-top{
-  display:flex;
-  justify-content:center;
-  margin:25px 0;
+<!-- STYLES -->
+<style>
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
 }
 
-.ad-middle{
-  display:flex;
-  justify-content:center;
-  margin:35px 0;
+/* BACKDROP */
+.backdrop img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
-.floating-left{
-  position:fixed;
-  left:10px;
-  top:120px;
-  z-index:50;
+/* INFO (DESKTOP DEFAULT) */
+.info {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  align-items: flex-start;
 }
 
-.floating-right{
-  position:fixed;
-  right:10px;
-  top:120px;
-  z-index:50;
+/* POSTER */
+.poster {
+  width: 180px;
+  border-radius: 10px;
+  flex-shrink: 0;
 }
 
-.mobile-sticky{
-  display:none;
+/* TEXT AREA */
+.info div {
+  flex: 1;
 }
 
-@media(max-width:1400px){
+/* PLAYER RESPONSIVE FIX */
+.player {
+  width: 100%;
+  margin-top: 20px;
+  aspect-ratio: 16 / 9;
+}
 
+.player iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 10px;
+}
+
+/* EPISODE GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+}
+
+.ep-btn {
+  padding: 10px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.ep-btn:hover {
+  background: #444;
+}
+
+/* ADS */
+.ad-top,
+.ad-middle {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0;
+}
+
+/* TELEGRAM */
+.telegram-box {
+  margin: 30px auto;
+  padding: 30px 20px;
+  background: #161616;
+  border-radius: 16px;
+  text-align: center;
+  border: 1px solid #222;
+}
+
+.telegram-box p {
+  color: #ccc;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.telegram-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 52px;
+  padding: 0 30px;
+  background: #229ED9;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* FLOAT ADS */
+.floating-left,
+.floating-right {
+  position: fixed;
+  top: 120px;
+  z-index: 50;
+}
+
+.floating-left { left: 10px; }
+.floating-right { right: 10px; }
+
+/* MOBILE FIX */
+@media (max-width: 768px) {
+
+  .container {
+    padding: 12px;
+  }
+
+  /* INFO → STACK VERTICAL */
+  .info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* POSTER RESPONSIVE */
+  .poster {
+    width: 60%;
+    max-width: 220px;
+  }
+
+  /* BACKDROP LEBIH KECIL */
+  .backdrop img {
+    height: 180px;
+  }
+
+  /* TEXT RAPI */
+  .info h1 {
+    font-size: 18px;
+  }
+
+  .info p {
+    font-size: 13px;
+  }
+
+  /* EPISODE GRID */
+  .grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  /* HIDE ADS FLOAT */
   .floating-left,
-  .floating-right{
-    display:none;
+  .floating-right {
+    display: none;
   }
 
-}
-
-@media(max-width:768px){
-
-  .desktop-only{
-    display:none;
-  }
-
-  .mobile-sticky{
-    display:flex;
-    justify-content:center;
-
-    position:fixed;
-    bottom:0;
-    left:0;
-
-    width:100%;
-
-    background:#111;
-
-    padding:5px 0;
-
-    z-index:999999;
-  }
-
-  body{
-    padding-bottom:70px;
-  }
-
-}
-/* TELEGRAM CTA */
-
-.telegram-box{
-  margin:30px auto;
-  padding:30px 20px;
-  background:#161616;
-  border-radius:16px;
-  text-align:center;
-  border:1px solid #222;
-}
-
-.telegram-box p{
-  color:#ccc;
-  font-size:18px;
-  margin-bottom:20px;
-  line-height:1.7;
-}
-
-.telegram-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height:52px;
-  padding:0 30px;
-  background:#229ED9;
-  color:white;
-  border-radius:12px;
-  font-weight:700;
-  font-size:16px;
-  transition:.2s;
-}
-
-.telegram-btn:hover{
-  transform:translateY(-2px);
-  opacity:.9;
-}
-
-@media(max-width:768px){
-
-  .telegram-box{
-    padding:25px 15px;
-  }
-
-  .telegram-box p{
-    font-size:15px;
-  }
-
-  .telegram-btn{
-    width:100%;
-    height:50px;
-    font-size:15px;
-  }
-
-}
-.bottom-ad{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin:40px auto;
-  overflow:hidden;
-}
-
-@media(max-width:768px){
-  .bottom-ad{
-    transform:scale(.85);
-    transform-origin:center;
+  /* FIX BOTTOM SPACE */
+  body {
+    padding-bottom: 70px;
   }
 }
-  </style>
-  <div class="floating-left desktop-only">
+</style>
 
+<!-- FLOAT ADS LEFT -->
+<div class="floating-left desktop-only">
   <script is:inline>
     atOptions = {
       'key' : 'e132c6412476f3cc77d11b3519cd21b9',
@@ -321,15 +336,11 @@ const firstEpisode =
       'params' : {}
     };
   </script>
-
-  <script
-    is:inline
-    src="https://buffcasualwhine.com/e132c6412476f3cc77d11b3519cd21b9/invoke.js">
-  </script>
-
+  <script is:inline src="https://buffcasualwhine.com/e132c6412476f3cc77d11b3519cd21b9/invoke.js"></script>
 </div>
+
+<!-- FLOAT ADS RIGHT -->
 <div class="floating-right desktop-only">
-
   <script is:inline>
     atOptions = {
       'key' : 'e132c6412476f3cc77d11b3519cd21b9',
@@ -339,15 +350,11 @@ const firstEpisode =
       'params' : {}
     };
   </script>
-
-  <script
-    is:inline
-    src="https://buffcasualwhine.com/e132c6412476f3cc77d11b3519cd21b9/invoke.js">
-  </script>
-
+  <script is:inline src="https://buffcasualwhine.com/e132c6412476f3cc77d11b3519cd21b9/invoke.js"></script>
 </div>
-<div class="mobile-sticky">
 
+<!-- MOBILE STICKY ADS -->
+<div class="mobile-sticky">
   <script is:inline>
     atOptions = {
       'key' : '113942e911746c421f6b5497bf65a2c6',
@@ -357,17 +364,11 @@ const firstEpisode =
       'params' : {}
     };
   </script>
-
-  <script
-    is:inline
-    src="https://buffcasualwhine.com/113942e911746c421f6b5497bf65a2c6/invoke.js">
-  </script>
-
+  <script is:inline src="https://buffcasualwhine.com/113942e911746c421f6b5497bf65a2c6/invoke.js"></script>
 </div>
 
 <!-- BOTTOM ADS -->
 <div class="bottom-ad">
-
   <script is:inline>
     atOptions = {
       'key' : 'ee6fbbaee01d7a12aeeb5d58f3126e1f',
@@ -377,12 +378,7 @@ const firstEpisode =
       'params' : {}
     };
   </script>
-
-  <script
-    is:inline
-    src="https://buffcasualwhine.com/ee6fbbaee01d7a12aeeb5d58f3126e1f/invoke.js">
-  </script>
-
+  <script is:inline src="https://buffcasualwhine.com/ee6fbbaee01d7a12aeeb5d58f3126e1f/invoke.js"></script>
 </div>
 
 </BaseLayout>

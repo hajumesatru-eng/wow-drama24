@@ -7,14 +7,14 @@
 html{
   scroll-behavior:smooth;
 }
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
 
 body{
   background:#0f0f0f;
   color:white;
 
   font-family:
-  Arial,
-  Helvetica,
+  Noto Sans Thai,
   sans-serif;
 
   overflow-x:hidden;

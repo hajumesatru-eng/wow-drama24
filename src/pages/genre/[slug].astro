@@ -1,0 +1,211 @@
+---
+import { genres } from "../../data/genres.js";
+import dramas from "../../data/dramas.json";
+import Navbar from "../../components/Navbar.astro";
+
+export async function getStaticPaths() {
+  return genres.map((g) => ({
+    params: { slug: g.slug },
+  }));
+}
+
+const slug = Astro.params.slug ?? "";
+
+// genre info
+const genre = genres.find((g) => g.slug === slug);
+
+// filter dramas by genre
+const filtered = dramas.filter((d) =>
+  Array.isArray(d.genre) &&
+  d.genre.includes(slug)
+);
+---
+
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- Thai font fix -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <Navbar />
+
+    <main class="wrapper">
+
+      <!-- TITLE -->
+      <section class="header">
+        <h1>{genre?.name_th ?? "ไม่พบหมวดหมู่"}</h1>
+        <p>{genre?.name}</p>
+      </section>
+
+      <!-- CONTENT -->
+      <section class="content">
+
+        {filtered.length === 0 ? (
+          <div class="empty">
+            ไม่พบซีรี่ย์ในหมวดนี้
+          </div>
+        ) : (
+          <div class="grid">
+            {filtered.map((drama) => (
+              <a href={`/drama/${drama.slug}`} class="card">
+
+                <div class="poster">
+                  <img src={drama.poster} alt={drama.title} />
+                </div>
+
+                <div class="info">
+                  <h3>{drama.title_th}</h3>
+                  <span>{drama.year}</span>
+                </div>
+
+              </a>
+            ))}
+          </div>
+        )}
+
+      </section>
+
+    </main>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Noto Sans Thai", sans-serif;
+        background: #0b0b0b;
+        color: #fff;
+      }
+
+      /* CENTER LAYOUT */
+      .wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 90px 16px 60px;
+      }
+
+      /* HEADER CENTER */
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .header p {
+        color: #aaa;
+        font-size: 14px;
+        margin-top: 6px;
+      }
+
+      /* GRID */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+        justify-content: center;
+      }
+
+      /* CARD (Netflix style) */
+      .card {
+        background: #141414;
+        border-radius: 10px;
+        overflow: hidden;
+        text-decoration: none;
+        color: white;
+        transition: 0.25s ease;
+        border: 1px solid #222;
+      }
+
+      .card:hover {
+        transform: translateY(-6px);
+        border-color: #444;
+      }
+
+      /* POSTER */
+      .poster {
+        width: 100%;
+        height: 240px;
+        overflow: hidden;
+      }
+
+      .poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* INFO */
+      .info {
+        padding: 10px;
+        text-align: center;
+      }
+
+      .info h3 {
+        font-size: 13px;
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .info span {
+        font-size: 12px;
+        color: #aaa;
+      }
+
+      /* EMPTY STATE */
+      .empty {
+        text-align: center;
+        padding: 30px;
+        background: #141414;
+        border-radius: 10px;
+        color: #888;
+        border: 1px solid #222;
+      }
+
+      /* RESPONSIVE MOBILE */
+      @media (max-width: 768px) {
+        .wrapper {
+          padding: 80px 12px 50px;
+        }
+
+        .header h1 {
+          font-size: 22px;
+        }
+
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+
+        .poster {
+          height: 200px;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .poster {
+          height: 180px;
+        }
+      }
+    </style>
+  </body>
+</html>

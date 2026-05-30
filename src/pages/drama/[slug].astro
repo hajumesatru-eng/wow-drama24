@@ -3,6 +3,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Navbar from "../../components/Navbar.astro";
 import DramaCard from "../../components/DramaCard.astro";
 import dramas from "../../data/dramas.json";
+import episodesData from "../../data/episodes.json";
+
+const slug = Astro.params.slug ?? "";
+const episodeData = episodesData.find(e => e.slug === slug);
+const episodes = episodeData?.episodes || [];
+const firstEpisode = episodes[0]?.url || "";
 
 // =======================
 // ✅ WAJIB: getStaticPaths
@@ -79,7 +85,7 @@ const metaTitle = `ดูซีรี่ส์จีน ${drama.title} (${drama.
         <p class="desc">{description}</p>
 
         <p><strong>Year:</strong> {drama.year}</p>
-        <p><strong>Category:</strong> {drama.category}</p>
+        <p><strong>Category:</strong> {drama.genre}</p>
 
         <a
          class="watch-btn"
