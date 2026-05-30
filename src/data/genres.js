@@ -110,9 +110,6 @@ export const genres = [
     name_th: "คาวบอยตะวันตก",
     slug: "western"
   },
-<<<<<<< HEAD
-
-  // 🌸 CUSTOM GENRES (DRAMA ASIA STYLE)
   {
     name: "Romance",
     name_th: "โรแมนซ์",
@@ -139,8 +136,6 @@ export const genres = [
     slug: "thriller"
   },
   {
-=======
-  {
     id: 100001,
     name: "Boy Love (BL)",
     name_th: "บอยเลิฟ (BL)",
@@ -153,7 +148,4 @@ export const genres = [
     name_th: "เกิร์ลเลิฟ (GL)",
     slug: "gl"
   }
-<<<<<<< HEAD
-];
-=======
 ];
