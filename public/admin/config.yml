@@ -1,30 +1,24 @@
 backend:
   name: github
-  repo: USERNAME/wow-drama24
+  repo: hajumesatru-eng/wow-drama24
   branch: main
-  auth_scope: repo
-
-  auth:
-    client_id: Ov23liXKXDBQYO2REQmi
 
 media_folder: "public/images"
 public_folder: "/images"
 
 collections:
   - name: "dramas"
-    label: "Drama List"
-    files:
-      - file: "src/data/dramas.json"
-        label: "Dramas"
-        name: "dramas"
-        fields:
-          - name: list
-            label: List
-            widget: list
-            fields:
-              - { name: title, label: Title, widget: string }
-              - { name: slug, label: Slug, widget: string }
-              - { name: poster, label: Poster, widget: image }
-              - { name: category, label: Category, widget: list }
-              - { name: tmdb_id, label: TMDB ID, widget: string }
-              - { name: year, label: Year, widget: number }
+    label: "Drama"
+    folder: "src/data/dramas"
+    create: true
+    slug: "{{slug}}"
+    format: "json"
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: title_th, label: Title Thai, widget: string }
+      - { name: slug, label: Slug, widget: string }
+      - { name: poster, label: Poster, widget: image }
+      - { name: category, label: Category, widget: list }
+      - { name: genre, label: Genre, widget: list }
+      - { name: tmdb_id, label: TMDB ID, widget: string }
+      - { name: year, label: Year, widget: number }
