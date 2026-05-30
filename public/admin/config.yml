@@ -4,9 +4,6 @@ backend:
   branch: main
   auth_scope: repo
 
-  auth:
-    client_id: Ov23liXKXDBQYO2REQmi
-
 media_folder: "public/images"
 public_folder: "/images"
 
