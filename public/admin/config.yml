@@ -8,21 +8,17 @@ public_folder: "/images"
 
 collections:
   - name: "dramas"
-    label: "Drama List"
+    label: "Drama"
+    folder: "src/data/dramas"
+    create: true
+    slug: "{{slug}}"
     format: "json"
-    extension: json
-    files:
-      - file: "src/data/dramas.json"
-        label: "Dramas"
-        name: "dramas"
-        fields:
-          - name: list
-            label: List
-            widget: list
-            fields:
-              - { name: title, label: Title, widget: string }
-              - { name: slug, label: Slug, widget: string }
-              - { name: poster, label: Poster, widget: image }
-              - { name: category, label: Category, widget: list }
-              - { name: tmdb_id, label: TMDB ID, widget: string }
-              - { name: year, label: Year, widget: number }
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: title_th, label: Title Thai, widget: string }
+      - { name: slug, label: Slug, widget: string }
+      - { name: poster, label: Poster, widget: image }
+      - { name: category, label: Category, widget: list }
+      - { name: genre, label: Genre, widget: list }
+      - { name: tmdb_id, label: TMDB ID, widget: string }
+      - { name: year, label: Year, widget: number }
