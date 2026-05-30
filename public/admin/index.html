@@ -3,14 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wow Drama Admin</title>
+    <title>Wow Drama CMS</title>
   </head>
 
   <body>
-    <script src="https://unpkg.com/decap-cms@^3.1.2/dist/decap-cms.js"></script>
+    <script src="https://unpkg.com/decap-cms@3.4.0/dist/decap-cms.js"></script>
 
     <script>
-      CMS.init();
+      window.CMS_MANUAL_INIT = true;
+
+      fetch("/admin/config.yml")
+        .then((res) => res.text())
+        .then((config) => {
+          const CMS = window.CMS;
+          CMS.init({ config: jsyaml.load(config) });
+        });
     </script>
+
+    <script src="https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
   </body>
 </html>
