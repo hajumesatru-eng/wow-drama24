@@ -3,10 +3,19 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Navbar from "../components/Navbar.astro";
 import SearchBox from "../components/SearchBox.astro";
 import DramaCard from "../components/DramaCard.astro";
-import dramas from "../data/dramas.json";
+import { supabase } from "../lib/supabase.js";
 
-const PER_PAGE = 15;
-const latest = dramas.slice(0, PER_PAGE);
+const PER_PAGE = 30;
+
+const { data, count } = await supabase
+  .from("dramas")
+  .select("*", { count: "exact" })
+  .order("created_at", { ascending: false })
+  .range(0, PER_PAGE - 1);
+
+const latest = data || [];
+
+const totalPages = Math.ceil((count || 0) / PER_PAGE);
 ---
 
 <BaseLayout
@@ -41,7 +50,32 @@ const latest = dramas.slice(0, PER_PAGE);
       <DramaCard drama={drama} />
     ))}
   </div>
+{
+  totalPages > 1 && (
+    <div class="pagination">
 
+      <span class="current">
+        Page 1
+      </span>
+
+      {
+        Array.from(
+          { length: Math.min(totalPages, 10) },
+          (_, i) => (
+            <a href={`/page/${i + 1}`}>
+              {i + 1}
+            </a>
+          )
+        )
+      }
+
+      <a href="/page/2">
+        Next →
+      </a>
+
+    </div>
+  )
+}
 </section>
 
 <!-- SEO INTERNAL LINK BLOCK -->
@@ -111,5 +145,134 @@ const latest = dramas.slice(0, PER_PAGE);
   background:#e50914;
   color:white;
   border-radius:8px;
+}
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:0 16px;
+}
+
+.latest-section{
+  margin-top:40px;
+}
+
+.latest-section h2{
+  margin-bottom:20px;
+}
+
+.drama-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:16px;
+}
+
+.seo-content{
+  max-width:900px;
+  margin:60px auto;
+  line-height:1.9;
+  color:#bbb;
+}
+
+.seo-content h2{
+  color:#fff;
+  margin-bottom:20px;
+}
+
+.seo-links{
+  margin-top:40px;
+}
+
+.seo-links ul{
+  padding-left:20px;
+}
+
+.seo-links li{
+  margin-bottom:10px;
+}
+
+@media(max-width:768px){
+
+  .hero{
+    padding:30px 10px;
+  }
+
+  .hero h1{
+    font-size:26px;
+    line-height:1.4;
+  }
+
+  .hero p{
+    font-size:14px;
+    line-height:1.8;
+    padding:0 5px;
+  }
+
+  .cta{
+    width:100%;
+    max-width:280px;
+    text-align:center;
+  }
+
+  .latest-section h2{
+    font-size:22px;
+  }
+
+  .seo-content{
+    font-size:14px;
+    line-height:1.9;
+  }
+
+  .seo-content h2{
+    font-size:22px;
+    line-height:1.5;
+  }
+
+  .drama-grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+  }
+}
+.pagination{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin-top:40px;
+}
+
+.pagination a,
+.pagination span{
+  padding:10px 16px;
+  border-radius:8px;
+  text-decoration:none;
+}
+
+.pagination a{
+  background:#1f1f1f;
+  color:white;
+}
+
+.pagination a:hover{
+  background:#e50914;
+}
+
+.pagination .current{
+  background:#e50914;
+  color:white;
+}
+
+@media(max-width:768px){
+
+  .pagination{
+    gap:6px;
+  }
+
+  .pagination a,
+  .pagination span{
+    padding:8px 12px;
+    font-size:14px;
+  }
+
 }
 </style>

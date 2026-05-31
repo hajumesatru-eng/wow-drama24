@@ -1,6 +1,5 @@
 export const genres = [
   {
-
     id: 10759,
     name: "Action & Adventure",
     name_th: "แอคชั่น & ผจญภัย",
@@ -19,7 +18,6 @@ export const genres = [
     slug: "comedy"
   },
   {
-
     id: 80,
     name: "Crime",
     name_th: "อาชญากรรม",
@@ -97,27 +95,34 @@ export const genres = [
     name_th: "คาวบอยตะวันตก",
     slug: "western"
   },
+
+  // Custom Genres
   {
+    id: 10749,
     name: "Romance",
     name_th: "โรแมนซ์",
     slug: "romance"
   },
   {
+    id: 36000,
     name: "Historical",
     name_th: "ย้อนยุค",
     slug: "historical"
   },
   {
+    id: 36001,
     name: "Fantasy Romance",
     name_th: "แฟนตาซีโรแมนซ์",
     slug: "fantasy-romance"
   },
   {
+    id: 36002,
     name: "School",
     name_th: "วัยเรียน",
     slug: "school"
   },
   {
+    id: 53,
     name: "Thriller",
     name_th: "ระทึกขวัญ",
     slug: "thriller"

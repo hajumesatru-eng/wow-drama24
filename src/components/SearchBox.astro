@@ -1,7 +1,3 @@
----
-import dramas from "../data/dramas.json";
----
-
 <div class="search-box">
 
   <input
@@ -9,18 +5,24 @@ import dramas from "../data/dramas.json";
     type="text"
     placeholder="ค้นหาซีรี่ย์..."
     autocomplete="off"
+    aria-label="Search Drama"
   />
 
-  <div id="searchResults" class="results"></div>
+  <div
+    id="searchResults"
+    class="results"
+    role="listbox"
+  ></div>
 
 </div>
 
-<script define:vars={{ dramas }}>
+<script is:inline>
 
 const input = document.getElementById("searchInput");
 const results = document.getElementById("searchResults");
 
-// ENTER SEARCH
+let debounceTimer;
+
 input.addEventListener("keydown", (e) => {
 
   if (e.key === "Enter") {
@@ -35,90 +37,108 @@ input.addEventListener("keydown", (e) => {
 
 });
 
-// LIVE SEARCH
 input.addEventListener("input", () => {
 
-  const keyword = input.value.toLowerCase().trim();
+  clearTimeout(debounceTimer);
 
-  results.innerHTML = "";
+  debounceTimer = setTimeout(async () => {
 
-  if (!keyword) {
-    results.style.display = "none";
-    return;
-  }
+    const keyword =
+      input.value.trim();
 
-  const filtered = dramas.filter((drama) => {
+    results.innerHTML = "";
 
-  const title =
-    (drama.title || "").toLowerCase();
+    if (!keyword) {
+      results.style.display = "none";
+      return;
+    }
 
-  const titleTh =
-    (drama.title_th || "").toLowerCase();
+    try {
 
-  const words = title.split(" ");
+      const res = await fetch(
+        `/api/search?q=${encodeURIComponent(keyword)}`
+      );
 
-  return (
+      const dramas = await res.json();
 
-    title.includes(keyword) ||
+      if (!dramas.length) {
 
-    titleTh.includes(keyword) ||
+        results.innerHTML = `
+          <div class="no-result">
+            ไม่พบซีรี่ย์
+          </div>
+        `;
 
-    words.some(word =>
-      word.startsWith(keyword)
-    )
+        results.style.display = "block";
+        return;
+      }
 
-  );
+      dramas.forEach((drama) => {
 
- });
+        const poster =
+          drama.poster ||
+          "https://placehold.co/50x75";
 
-  if (filtered.length === 0) {
+        results.innerHTML += `
+          <a
+            href="/drama/${drama.slug}"
+            class="result-item"
+          >
 
-    results.innerHTML = `
-      <div class="no-result">
-        ไม่พบซีรี่ย์
-      </div>
-    `;
+            <img
+              src="${poster}"
+              alt="${drama.title}"
+              loading="lazy"
+              width="50"
+              height="75"
+            />
 
-    results.style.display = "block";
-    return;
-  }
+            <div class="info">
 
-  filtered.slice(0, 5).forEach((drama) => {
+              <h3>
+                ${drama.title || ""}
+              </h3>
 
-    results.innerHTML += `
-      <a href="/${drama.slug}" class="result-item">
+              <p>
+                ${drama.title_th || ""}
+              </p>
 
-        <img
-  src="${drama.poster}"
-  alt="${drama.title}"
-  style="
-    width:50px;
-    height:75px;
-    min-width:50px;
-    max-width:50px;
-    object-fit:cover;
-    border-radius:6px;
-  "
-/>
+            </div>
 
-        <div class="info">
-          <h3>${drama.title}</h3>
-          <p>${drama.title_th || ""}</p>
+          </a>
+        `;
+      });
+
+      results.style.display = "block";
+
+    } catch (err) {
+
+      console.error(err);
+
+      results.innerHTML = `
+        <div class="no-result">
+          Search error
         </div>
+      `;
 
-      </a>
-    `;
+      results.style.display = "block";
+    }
 
-  });
-
-  results.style.display = "block";
+  }, 300);
 
 });
 
-// CLICK OUTSIDE
 document.addEventListener("click", (e) => {
 
   if (!e.target.closest(".search-box")) {
+    results.style.display = "none";
+  }
+
+});
+
+document.addEventListener("keydown", (e) => {
+
+  if (e.key === "Escape") {
     results.style.display = "none";
   }
 
@@ -145,6 +165,11 @@ document.addEventListener("click", (e) => {
   padding:0 20px;
   color:white;
   font-size:16px;
+  box-sizing:border-box;
+}
+
+.search-box input:focus{
+  box-shadow:0 0 0 2px rgba(255,255,255,.1);
 }
 
 .results{
@@ -179,11 +204,9 @@ document.addEventListener("click", (e) => {
 }
 
 .result-item img{
-  width:50px !important;
-  height:75px !important;
-  min-width:50px !important;
-  max-width:50px !important;
-
+  width:50px;
+  height:75px;
+  min-width:50px;
   object-fit:cover;
   border-radius:6px;
   display:block;
@@ -197,13 +220,23 @@ document.addEventListener("click", (e) => {
 .result-item h3{
   margin:0;
   font-size:14px;
+  line-height:1.4;
   color:#fff;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 .result-item p{
   margin-top:4px;
   font-size:12px;
+  line-height:1.4;
   color:#aaa;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 .no-result{
@@ -214,13 +247,38 @@ document.addEventListener("click", (e) => {
 
 @media(max-width:768px){
 
+  .search-box{
+    margin:16px auto;
+  }
+
+  .search-box input{
+    height:52px;
+    font-size:14px;
+    padding:0 16px;
+  }
+
   .results{
-    top:65px;
+    top:60px;
+    max-height:320px;
+  }
+
+  .result-item{
+    padding:10px;
+    gap:10px;
   }
 
   .result-item img{
-    width:50px !important;
-    height:75px !important;
+    width:46px;
+    height:68px;
+    min-width:46px;
+  }
+
+  .result-item h3{
+    font-size:13px;
+  }
+
+  .result-item p{
+    font-size:11px;
   }
 
 }

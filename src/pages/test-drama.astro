@@ -1,0 +1,27 @@
+<script is:inline>
+  window.addEventListener("load", async () => {
+    try {
+      console.log("TEST FETCH START");
+
+      const res = await fetch("/api/save-drama", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          slug: "test-drama",
+          title: "Test Drama"
+        })
+      });
+
+      console.log("STATUS:", res.status);
+
+      const text = await res.text();
+      console.log("RAW RESPONSE:", text);
+
+      alert("FETCH OK");
+    } catch (err) {
+      console.error("FETCH ERROR:", err);
+    }
+  });
+</script>

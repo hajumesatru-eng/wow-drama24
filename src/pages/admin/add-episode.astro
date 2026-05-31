@@ -1,0 +1,115 @@
+---
+import { supabase } from "../../lib/supabase.js";
+
+// ambil semua drama untuk dropdown
+const { data: dramas } = await supabase
+  .from("dramas")
+  .select("slug, title, tmdb_id")
+  .order("title", { ascending: true });
+---
+
+<html>
+<head>
+  <title>Add Episode</title>
+</head>
+
+<body>
+
+<h1>🎞 Add Episode (Auto Vidlink System)</h1>
+
+<p>👉 Video URL akan digenerate otomatis dari TMDB ID</p>
+
+<hr />
+
+<form id="episodeForm">
+
+  <!-- SELECT DRAMA -->
+  <select id="drama_slug" required>
+    <option value="">Select Drama</option>
+    {dramas?.map((d) => (
+      <option 
+        value={d.slug}
+        data-tmdb={d.tmdb_id}
+      >
+        {d.title}
+      </option>
+    ))}
+  </select>
+
+  <br /><br />
+
+  <!-- SEASON -->
+  <input
+    id="season_number"
+    type="number"
+    placeholder="Season Number (default 1)"
+    value="1"
+    required
+  />
+
+  <br /><br />
+
+  <!-- EPISODE -->
+  <input
+    id="episode_number"
+    type="number"
+    placeholder="Episode Number"
+    required
+  />
+
+  <br /><br />
+
+  <button type="submit">💾 Save Episode</button>
+
+</form>
+
+<p id="status"></p>
+
+<script is:inline>
+
+const form = document.getElementById("episodeForm");
+const status = document.getElementById("status");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const select = document.getElementById("drama_slug");
+  const selectedOption = select.options[select.selectedIndex];
+
+  const tmdb_id = selectedOption.getAttribute("data-tmdb");
+
+  const payload = {
+    drama_slug: document.getElementById("drama_slug").value,
+    tmdb_id: Number(tmdb_id),
+    season_number: Number(document.getElementById("season_number").value),
+    episode_number: Number(document.getElementById("episode_number").value)
+  };
+
+  try {
+    const res = await fetch("/api/save-episode", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      status.innerText = "✅ Episode saved!";
+      form.reset();
+    } else {
+      status.innerText = "❌ Failed: " + data.error;
+    }
+
+  } catch (err) {
+    console.error(err);
+    status.innerText = "❌ Server error";
+  }
+});
+
+</script>
+
+</body>
+</html>

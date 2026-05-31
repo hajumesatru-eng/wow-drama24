@@ -2,66 +2,63 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Navbar from "../components/Navbar.astro";
 import SearchBox from "../components/SearchBox.astro";
-import dramas from "../data/dramas.json";
+import { supabase } from "../lib/supabase";
 
 const url = new URL(Astro.request.url);
 
 const q = url.searchParams.get("q")?.trim() || "";
-
 const keyword = q.toLowerCase();
 
-// Similarity sederhana untuk typo
-function similarity(a: string, b: string): number {
+// Ambil semua drama dari Supabase
+const { data: dramas } = await supabase
+  .from("dramas")
+  .select("*")
+  .order("created_at", { ascending: false });
 
+function similarity(a: string, b: string): number {
   a = a.toLowerCase();
   b = b.toLowerCase();
 
   let score = 0;
 
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
-
-    if (a[i] === b[i]) {
-      score++;
-    }
-
+    if (a[i] === b[i]) score++;
   }
 
-  return score / Math.max(a.length, b.length);
+  return score / Math.max(a.length || 1, b.length || 1);
 }
 
-// HASIL PENCARIAN
-const results = dramas.filter((d) => {
+const results =
+  dramas?.filter((d) => {
+    return (
+      d.title?.toLowerCase().includes(keyword) ||
+      d.title_th?.toLowerCase().includes(keyword) ||
+      d.slug?.toLowerCase().includes(keyword)
+    );
+  }) || [];
 
-  return (
-    d.title?.toLowerCase().includes(keyword) ||
-    d.title_th?.toLowerCase().includes(keyword)
-  );
-
-});
-
-// TYPO SUGGESTION
-const suggestions = dramas
-  .map((d) => ({
-
-    ...d,
-
-    score: Math.max(
-      similarity(keyword, d.title || ""),
-      similarity(keyword, d.title_th || "")
-    )
-
-  }))
-  .sort((a, b) => b.score - a.score)
-  .slice(0, 5);
+const suggestions =
+  dramas
+    ?.map((d) => ({
+      ...d,
+      score: Math.max(
+        similarity(keyword, d.title || ""),
+        similarity(keyword, d.title_th || "")
+      )
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5) || [];
 ---
 
 <BaseLayout
   title={`Search: ${q} | WOW-DRAMA24`}
   description={`Search results for ${q}`}
 >
+
 <Navbar />
 
 <SearchBox />
+
 <section class="search-page">
 
   <h1>
@@ -80,8 +77,9 @@ const suggestions = dramas
         >
 
           <img
-            src={d.poster}
+            src={d.poster || "/no-poster.jpg"}
             alt={d.title}
+            loading="lazy"
           />
 
           <h3>{d.title}</h3>
@@ -100,17 +98,17 @@ const suggestions = dramas
 
     <div class="empty">
 
-  <h2>
-    ไม่พบผลลัพธ์สำหรับ "{q}"
-  </h2>
+      <h2>
+        ไม่พบผลลัพธ์สำหรับ "{q}"
+      </h2>
 
-  <p>
-    ลองค้นหาด้วยคำอื่น หรือกลับไปหน้าแรก
-  </p>
+      <p>
+        ลองค้นหาด้วยคำอื่น หรือกลับไปหน้าแรก
+      </p>
 
-  <a href="/" class="home-btn">
-    🏠 กลับหน้าแรก
-  </a>
+      <a href="/" class="home-btn">
+        🏠 กลับหน้าแรก
+      </a>
 
       {suggestions.length > 0 && (
 
@@ -129,11 +127,12 @@ const suggestions = dramas
               >
 
                 <img
-                  src={d.poster}
+                  src={d.poster || "/no-poster.jpg"}
                   alt={d.title}
+                  loading="lazy"
                 />
 
-                <div>
+                <div class="suggestion-content">
 
                   <strong>
                     {d.title}
@@ -174,6 +173,9 @@ const suggestions = dramas
 
 .search-page h1{
   margin-bottom:30px;
+  font-size:28px;
+  line-height:1.4;
+  word-break:break-word;
 }
 
 .grid{
@@ -185,24 +187,36 @@ const suggestions = dramas
 
 .card{
   text-decoration:none;
+  display:block;
 }
 
 .card img{
   width:100%;
   border-radius:10px;
+  aspect-ratio:2/3;
+  object-fit:cover;
 }
 
 .card h3{
   color:white;
   margin-top:10px;
+  font-size:16px;
+  line-height:1.4;
+  min-height:44px;
 }
 
 .card p{
   color:#aaa;
+  font-size:14px;
+  line-height:1.4;
 }
 
 .empty{
   margin-top:30px;
+}
+
+.empty h2{
+  line-height:1.5;
 }
 
 .maybe{
@@ -226,6 +240,7 @@ const suggestions = dramas
   border-radius:10px;
   color:white;
   transition:.2s;
+  text-decoration:none;
 }
 
 .suggestion-item:hover{
@@ -239,33 +254,81 @@ const suggestions = dramas
   border-radius:6px;
 }
 
+.suggestion-content{
+  flex:1;
+  min-width:0;
+}
+
+.suggestion-content strong{
+  display:block;
+  line-height:1.4;
+  word-break:break-word;
+}
+
 .suggestion-item p{
   color:#999;
   font-size:13px;
   margin-top:4px;
+  line-height:1.4;
 }
 
-@media(max-width:768px){
-
-  .grid{
-    grid-template-columns:
-    repeat(2,1fr);
-  }
-
-}
 .home-btn{
   display:inline-block;
   margin-top:20px;
   padding:12px 20px;
-
   background:#e50914;
   color:white;
-
   border-radius:8px;
   font-weight:bold;
+  text-decoration:none;
 }
 
 .home-btn:hover{
   opacity:.9;
 }
+
+@media(max-width:768px){
+
+  .search-page{
+    padding:20px 12px;
+  }
+
+  .search-page h1{
+    font-size:22px;
+  }
+
+  .grid{
+    grid-template-columns:
+    repeat(2,1fr);
+    gap:14px;
+  }
+
+  .card h3{
+    font-size:14px;
+    min-height:auto;
+  }
+
+  .card p{
+    font-size:12px;
+  }
+
+  .suggestion-item{
+    padding:8px;
+  }
+
+  .suggestion-item img{
+    width:45px;
+    height:68px;
+  }
+
+  .suggestion-content strong{
+    font-size:14px;
+  }
+
+  .suggestion-item p{
+    font-size:12px;
+  }
+
+}
+
 </style>

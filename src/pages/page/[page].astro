@@ -3,82 +3,81 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Navbar from "../../components/Navbar.astro";
 import SearchBox from "../../components/SearchBox.astro";
 import DramaCard from "../../components/DramaCard.astro";
+import { supabase } from "../../lib/supabase.js";
 
-import dramas from "../../data/dramas.json";
+const PER_PAGE = 30;
 
-/* =========================
-   STATIC PATHS
-   ========================= */
-export function getStaticPaths() {
-  const PER_PAGE = 15;
+const currentPage = Number(Astro.params.page || 1);
 
-  const totalPages = Math.ceil(dramas.length / PER_PAGE);
+const from = (currentPage - 1) * PER_PAGE;
+const to = from + PER_PAGE - 1;
 
-  return Array.from({ length: totalPages }).map((_, i) => ({
-    params: { page: String(i + 1) },
-  }));
-}
+const { data, count } = await supabase
+  .from("dramas")
+  .select("*", { count: "exact" })
+  .order("created_at", { ascending: false })
+  .range(from, to);
 
-/* =========================
-   PAGE LOGIC
-   ========================= */
-const PER_PAGE = 15;
+const dramas = data || [];
 
-const page = Number(Astro.params.page ?? "1");
-
-const totalPages = Math.ceil(dramas.length / PER_PAGE);
-
-const safePage = Math.min(Math.max(page, 1), totalPages);
-
-const start = (safePage - 1) * PER_PAGE;
-const end = start + PER_PAGE;
-
-const paginated = dramas.slice(start, end);
+const totalPages = Math.ceil((count || 0) / PER_PAGE);
 ---
-
 <BaseLayout
-  title={`Page ${safePage} | ดูซีรี่ย์จีนพากย์ไทย | เว็บดูซีรี่ย์ออนไลน์ฟรี HD`}
-  description="สำหรับคนที่ชื่นชอบ ดูซีรี่ย์ออนไลน์ วันนี้เรามีซีรี่ย์เรื่องใหม่ๆ มาให้รับชมกันแบเต็มเรื่อง (ครบทุกตอน) ทั้งซีรี่ย์จีนพากย์ไทย และซีรี่ย์จีนซับไทย ละครไทยย้อนหลัง (ซีรี่ย์ไทย) และยังมีซีรี่ย์เกาหลี ซีรี่ย์ฮิตติดกระแส หรือซีรี่ญี่ปุ่นเราก็มี ทั้งหมดนี้ดูได้ที่นี้เลย!"
-  canonical={`https://wow-drama24.pages.dev/page/${safePage}`}
+  title={`Page ${currentPage} - ดูซีรี่ย์จีนพากย์ไทย | เว็บดูซีรี่ย์ออนไลน์ฟรี HD`}
+  description="Drama List"
 >
-<div class="container">
 
-  <Navbar />
-  <SearchBox />
+<Navbar />
+<SearchBox />
 
-  <section class="hero">
-    <h1>Drama Page {safePage}</h1>
-  </section>
+<section class="latest-section">
 
-  <section class="latest-section">
+<h1>All Dramas - Page {currentPage}</h1>
 
-    <div class="drama-grid">
-      {paginated.map((drama) => (
-        <DramaCard drama={drama} />
-      ))}
-    </div>
+<div class="drama-grid">
 
-    <div class="pagination">
+  {
+    dramas.map((drama) => (
+      <DramaCard drama={drama} />
+    ))
+  }
 
-      {safePage > 1 && (
-        <a href={`/page/${safePage - 1}`}>Prev</a>
-      )}
+</div>
 
-      {Array.from({ length: totalPages }).map((_, i) => {
-        const p = i + 1;
-        return (
-          <a href={`/page/${p}`} class={safePage === p ? "active" : ""}>
-            {p}
-          </a>
-        );
-      })}
+<div class="pagination">
 
-      {safePage < totalPages && (
-        <a href={`/page/${safePage + 1}`}>Next</a>
-      )}
+  {
+    currentPage > 1 && (
+      <a href={currentPage === 2 ? "/" : `/page/${currentPage - 1}`}>
+        ← Prev
+      </a>
+    )
+  }
 
-    </div>
+  {
+    Array.from(
+      { length: totalPages },
+      (_, i) => (
+        <a
+          href={i === 0 ? "/" : `/page/${i + 1}`}
+          class={currentPage === i + 1 ? "active" : ""}
+        >
+          {i + 1}
+        </a>
+      )
+    )
+  }
 
-  </section>
+  {
+    currentPage < totalPages && (
+      <a href={`/page/${currentPage + 1}`}>
+        Next →
+      </a>
+    )
+  }
+
+</div>
+
+</section>
 
 </BaseLayout>

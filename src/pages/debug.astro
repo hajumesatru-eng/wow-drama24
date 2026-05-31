@@ -1,0 +1,16 @@
+---
+const url = Astro.url;
+---
+
+<pre>
+{JSON.stringify({
+  href: url.href,
+  search: url.search,
+  q: url.searchParams.get("q")
+}, null, 2)}
+</pre>
+
+<script>
+console.log(window.location.href);
+console.log(window.location.search);
+</script>

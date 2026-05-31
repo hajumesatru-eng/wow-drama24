@@ -2,30 +2,45 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Navbar from "../../components/Navbar.astro";
 import DramaCard from "../../components/DramaCard.astro";
-import dramas from "../../data/dramas.json";
-import episodesData from "../../data/episodes.json";
+import { supabase } from "../../lib/supabase.js";
 
-const slug = Astro.params.slug ?? "";
-const episodeData = episodesData.find(e => e.slug === slug);
-const episodes = episodeData?.episodes || [];
-const firstEpisode = episodes[0]?.url || "";
+const slug = Astro.params.slug;
 
 // =======================
-// ✅ WAJIB: getStaticPaths
+// DRAMA FROM SUPABASE
 // =======================
-export async function getStaticPaths() {
-  return dramas.map((d) => ({
-    params: { slug: d.slug },
-    props: { drama: d },
-  }));
+const { data: drama } = await supabase
+  .from("dramas")
+  .select("*")
+  .eq("slug", slug)
+  .single();
+
+if (!drama) {
+  return new Response("Drama not found", { status: 404 });
 }
 
-// ambil data dari props (bukan Astro.params lagi)
-const { drama } = Astro.props;
+// =======================
+// EPISODES FROM SUPABASE
+// =======================
+const { data: episodes } = await supabase
+  .from("episodes")
+  .select("*")
+  .eq("drama_slug", slug)
+  .order("episode_number", { ascending: true });
+
+// =======================
+// RELATED DRAMAS FROM SUPABASE
+// =======================
+const { data: related } = await supabase
+  .from("dramas")
+  .select("*")
+  .neq("slug", slug)
+  .limit(6);
 
 // fallback description
 const description = drama.overview || drama.title;
-const metaTitle = `ดูซีรี่ส์จีน ${drama.title} (${drama.year})` +
+const metaTitle =
+  `ดูซีรี่ส์จีน ${drama.title} (${drama.year})` +
   (drama.title_th ? ` ${drama.title_th}` : "") +
   ` พากย์ไทย (เต็มเรื่อง)`;
 ---
@@ -37,78 +52,88 @@ const metaTitle = `ดูซีรี่ส์จีน ${drama.title} (${drama.
   canonical={`https://wow-drama24.pages.dev/drama/${drama.slug}/`}
 />
 
+<Navbar />
 
-  <Navbar />
+<!-- SEO Schema -->
+<script type="application/ld+json">
+  {JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "TVSeries",
+    "name": drama.title,
+    "alternateName": drama.title_th,
+    "description": description,
+    "url": `https://wow-drama24.pages.dev/drama/${drama.slug}`,
+    "image": {
+      "@type": "ImageObject",
+      "url": drama.poster,
+      "caption": drama.title
+    },
+    "genre": drama.category || "Drama",
+    "inLanguage": "th",
+    "publisher": {
+      "@type": "Organization",
+      "name": "WOW-DRAMA24"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://wow-drama24.pages.dev/drama/${drama.slug}`
+    }
+  })}
+</script>
 
-  <!-- SEO Schema -->
-  <script type="application/ld+json">
-    {JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "TVSeries",
-      "name": drama.title,
-      "alternateName": drama.title_th,
-      "description": description,
-      "url": `https://wow-drama24.pages.dev/drama/${drama.slug}`,
-      "image": {
-        "@type": "ImageObject",
-        "url": drama.poster,
-        "caption": drama.title
-      },
-      "genre": drama.category || "Drama",
-      "inLanguage": "th",
-      "publisher": {
-        "@type": "Organization",
-        "name": "WOW-DRAMA24"
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": `https://wow-drama24.pages.dev/drama/${drama.slug}`
-      }
-    })}
-  </script>
+<!-- CONTENT -->
+<section class="drama-detail">
+  <div class="container">
 
-  <!-- CONTENT -->
-  <section class="drama-detail">
-    <div class="container">
-
-      <!-- POSTER -->
-      <div class="poster">
-        <img src={drama.poster} alt={drama.title} />
-      </div>
-
-      <!-- INFO -->
-      <div class="info">
-        <h1>{drama.title}</h1>
-
-        {drama.title_th && <h2>{drama.title_th}</h2>}
-
-        <p class="desc">{description}</p>
-
-        <p><strong>Year:</strong> {drama.year}</p>
-        <p><strong>Category:</strong> {drama.genre}</p>
-
-        <a
-         class="watch-btn"
-         href={`/${drama.slug}/`}>
-         ▶ รับชมทุกตอน</a>
-      </div>
-
+    <div class="poster">
+      <img src={drama.poster} alt={drama.title} />
     </div>
-  </section>
 
-  <!-- RELATED -->
-  <section class="related">
-    <h2>ซีรีส์เพิ่มเติม</h2>
+    <div class="info">
+      <h1>{drama.title}</h1>
 
-    <div class="grid">
-      {dramas
-        .filter((d) => d.slug !== drama.slug)
-        .slice(0, 6)
-        .map((item) => (
-          <DramaCard drama={item} />
-        ))}
+      {drama.title_th && <h2>{drama.title_th}</h2>}
+
+      <p class="desc">{description}</p>
+
+      <p><strong>Year:</strong> {drama.year}</p>
+
+      <!-- FIX genre tampil lebih aman -->
+      <p><strong>Category:</strong> {drama.genre?.join(", ")}</p>
+
+      <a class="watch-btn" href={`/${drama.slug}`}>
+        ▶ รับชมทุกตอน
+      </a>
     </div>
-  </section>
+
+  </div>
+</section>
+
+<!-- EPISODES PREVIEW (OPTIONAL SAFE) -->
+<section class="episodes">
+  <h2>Episodes</h2>
+
+  {episodes?.length === 0 && <p>No episodes yet</p>}
+
+  <ul>
+    {episodes?.map((ep) => (
+      <li>
+        Episode {ep.episode_number}
+      </li>
+    ))}
+  </ul>
+</section>
+
+<!-- RELATED -->
+<section class="related">
+  <h2>ซีรีส์เพิ่มเติม</h2>
+
+  <div class="grid">
+    {related?.map((item) => (
+      <DramaCard drama={item} />
+    ))}
+  </div>
+</section>
 
 </BaseLayout>
 

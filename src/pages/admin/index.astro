@@ -1,0 +1,113 @@
+---
+import { supabase } from "../../lib/supabase";
+import { parse } from "cookie";
+
+const cookies = parse(Astro.request.headers.get("cookie") || "");
+
+// 🔐 PAKAI SUPABASE TOKEN (Bukan admin_token lagi)
+const token = cookies["sb-access-token"];
+
+if (!token) {
+  return Astro.redirect("/admin/login");
+}
+
+// ambil data
+const { data: dramas } = await supabase
+  .from("dramas")
+  .select("*")
+  .order("id", { ascending: false });
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+      padding: 20px;
+    }
+
+    .card {
+      background: #1c1c1c;
+      padding: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-left: 5px;
+      padding: 6px 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .del { background: red; color: white; }
+    .add { background: green; color: white; }
+    .edit { background: orange; color: black; }
+  </style>
+</head>
+
+<body>
+
+<h2>🎬 Admin Dashboard</h2>
+
+{dramas?.map((d: any) => (
+  <div class="card">
+    <div>
+      <b>{d.title}</b><br/>
+      Episode: {d.episodes}
+    </div>
+
+    <div>
+      <button class="add" onclick={`addEpisode("${d.id}")`}>➕</button>
+      <button class="edit" onclick={`updateEpisode("${d.id}")`}>✏️</button>
+      <button class="del" onclick={`deleteDrama("${d.id}")`}>❌</button>
+    </div>
+  </div>
+))}
+
+<script>
+async function addEpisode(id: string) {
+  await fetch("/api/add-episode", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  });
+
+  location.reload();
+}
+
+async function updateEpisode(id: string) {
+  const ep = prompt("Masukkan episode:");
+  if (!ep) return;
+
+  await fetch("/api/update-episode", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, episodes: Number(ep) })
+  });
+
+  location.reload();
+}
+
+async function deleteDrama(id: string) {
+  if (!confirm("Hapus drama?")) return;
+
+  await fetch("/api/delete-drama", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  });
+
+  location.reload();
+}
+</script>
+</body>
+</html>

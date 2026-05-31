@@ -1,0 +1,94 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f0f0f;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      background: #1c1c1c;
+      padding: 25px;
+      border-radius: 10px;
+      width: 320px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #msg {
+      text-align: center;
+      margin-top: 10px;
+      color: #ff8080;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+    <h2>Admin Login</h2>
+
+    <input id="username" placeholder="Username" />
+    <input id="password" type="password" placeholder="Password" />
+
+    <button onclick="login()">Login</button>
+
+    <p id="msg"></p>
+  </div>
+
+  <script>
+async function login() {
+  const usernameEl = document.querySelector("#username");
+  const passwordEl = document.querySelector("#password");
+  const msgEl = document.querySelector("#msg");
+
+  if (!usernameEl || !passwordEl || !msgEl) return;
+
+  const username = (usernameEl instanceof HTMLInputElement) ? usernameEl.value : "";
+  const password = (passwordEl instanceof HTMLInputElement) ? passwordEl.value : "";
+
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    window.location.href = "/admin";
+  } else {
+    msgEl.textContent = data.error || "Login gagal";
+  }
+}
+</script>
+
+</body>
+</html>

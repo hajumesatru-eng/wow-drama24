@@ -1,5 +1,6 @@
 ---
 import { categories } from '../data/categories';
+import { genres } from '../data/genres';
 ---
 
 <nav class="navbar">
@@ -11,24 +12,38 @@ import { categories } from '../data/categories';
       WOW-DRAMA24
     </a>
 
-    <!-- CATEGORY -->
+    <!-- CATEGORY (SEO MENU) -->
     <div class="nav-links">
 
-      {
-        categories.map((category) => (
-
-          <a
-            href={`/category/${category.slug}/`}
-            class="nav-item"
-          >
-            {category.name}
-          </a>
-
-        ))
-      }
+      {categories.map((category) => (
+        <a
+          href={`/category/${category.slug}/`}
+          class="nav-item"
+        >
+          {category.name}
+        </a>
+      ))}
 
     </div>
 
+    <!-- GENRE (FILTER MENU - THAI UI) -->
+     <div class="genre-dropdown">
+
+      <button class="genre-btn">
+            Genres ▼
+       </button>
+
+      <div class="genre-menu">
+
+    {genres.map((genre) => (
+      <a href={`/genre/${genre.slug}/`}>
+        {genre.name_th}
+      </a>
+    ))}
+
+  </div>
+
+</div>
   </div>
 
 </nav>
@@ -105,5 +120,63 @@ import { categories } from '../data/categories';
   }
 
 }
+.genre-dropdown{
+  position:relative;
+}
 
+.genre-btn{
+  background:none;
+  border:none;
+  color:white;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.genre-menu{
+  display:none;
+
+  position:absolute;
+  top:100%;
+  left:0;
+
+  width:260px;
+  max-height:450px;
+
+  overflow:auto;
+
+  background:#111;
+
+  border:1px solid #222;
+
+  border-radius:8px;
+
+  z-index:9999;
+}
+
+.genre-menu a{
+  display:block;
+
+  padding:10px 15px;
+
+  color:white;
+
+  text-decoration:none;
+}
+
+.genre-menu a:hover{
+  background:#e50914;
+}
+
+.genre-dropdown:hover .genre-menu{
+  display:block;
+}
+@media(max-width:768px){
+
+  .genre-menu{
+    width:100%;
+    position:static;
+    max-height:none;
+  }
+
+}
 </style>

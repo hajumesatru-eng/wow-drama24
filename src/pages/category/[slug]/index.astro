@@ -1,37 +1,33 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-
 import Navbar from '../../../components/Navbar.astro';
 import DramaCard from '../../../components/DramaCard.astro';
 
-import dramas from '../../../data/dramas.json';
-import { categories } from '../../../data/categories';
+import { supabase } from '../../../lib/supabase.js';
+import { categories } from '../../../data/categories.js';
 
-export async function getStaticPaths() {
+const slug = Astro.params.slug;
 
-  return categories.map((category) => ({
+// cari category dari URL
+const category =
+  categories.find((c) => c.slug === slug) ||
+  categories[0];
 
-    params: {
-      slug: category.slug
-    },
+const { data } = await supabase
+  .from('dramas')
+  .select('*')
+  .order('created_at', { ascending: false });
 
-    props: {
-      category
-    }
+const dramas = data || [];
 
-  }));
+const filteredDramas = dramas.filter((drama) => {
+  if (category.slug === 'the-series-all') {
+    return true;
+  }
 
-}
+  return drama.category === category.slug;
+});
 
-const { category } = Astro.props;
-
-const filteredDramas = dramas.filter(
-  drama =>
-
-    category.slug === 'the-series-all'
-    ? true
-    : drama.category === category.slug
-);
 const PER_PAGE = 10;
 
 const totalPages = Math.ceil(
@@ -53,9 +49,7 @@ const firstPage = filteredDramas.slice(
 
   <section class="category-hero">
 
-    <h1>
-      {category.name}
-    </h1>
+    <h1>{category.name}</h1>
 
     <p>
       {category.description}
@@ -65,28 +59,32 @@ const firstPage = filteredDramas.slice(
 
   <section class="category-content">
 
-    <div class="drama-grid">
+    {
+      firstPage.length > 0 ? (
+        <div class="drama-grid">
+          {
+            firstPage.map((drama) => (
+              <DramaCard drama={drama} />
+            ))
+          }
+        </div>
+      ) : (
+        <div class="empty-state">
+          No dramas available.
+        </div>
+      )
+    }
 
-      {
-        firstPage.map(drama => (
+    {
+      totalPages > 1 && (
+        <div class="pagination">
+          <a href={`/category/${category.slug}/page/2`}>
+            Next →
+          </a>
+        </div>
+      )
+    }
 
-          <DramaCard
-            drama={drama}
-          />
-
-        ))
-      }
-
-    </div>
-{
-  totalPages > 1 && (
-    <div class="pagination">
-      <a href={`/category/${category.slug}/page/2`}>
-        Next →
-      </a>
-    </div>
-  )
-}
   </section>
 
 </BaseLayout>
@@ -121,6 +119,54 @@ const firstPage = filteredDramas.slice(
   grid-template-columns:
   repeat(auto-fill,minmax(220px,1fr));
   gap:25px;
+}
+
+.pagination{
+  display:flex;
+  justify-content:center;
+  margin-top:40px;
+}
+
+.pagination a{
+  padding:12px 20px;
+  border-radius:8px;
+  text-decoration:none;
+  color:white;
+  background:#e50914;
+}
+
+.empty-state{
+  text-align:center;
+  color:#aaa;
+  padding:60px 20px;
+}
+
+@media (max-width:768px){
+
+  .category-hero{
+    padding:60px 15px 30px;
+  }
+
+  .category-hero h1{
+    font-size:32px;
+    line-height:1.3;
+  }
+
+  .category-hero p{
+    font-size:14px;
+    line-height:1.7;
+  }
+
+  .category-content{
+    padding:15px 12px 60px;
+  }
+
+  .drama-grid{
+    grid-template-columns:
+    repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+
 }
 
 </style>

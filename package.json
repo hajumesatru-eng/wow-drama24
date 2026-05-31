@@ -12,7 +12,9 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^13.6.0",
     "@astrojs/sitemap": "^3.7.3",
+    "@supabase/supabase-js": "^2.106.2",
     "astro": "^6.3.8",
     "axios": "^1.16.1"
   }

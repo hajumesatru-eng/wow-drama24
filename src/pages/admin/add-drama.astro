@@ -1,0 +1,254 @@
+---
+---
+
+<html lang="en">
+<head>
+  <title>Add Drama - Admin</title>
+</head>
+
+<body>
+
+<h1>🎬 Add Drama (TMDB Powered)</h1>
+
+<p>👉 Search TMDB and import automatically (recommended)</p>
+
+<hr />
+
+<!-- 🔍 TMDB SEARCH -->
+<h2>🔍 TMDB Search</h2>
+
+<input id="searchInput" placeholder="Search drama / movie..." />
+<button id="searchBtn">Search</button>
+
+<div id="results" style="margin-top: 20px;"></div>
+
+<hr />
+
+<!-- ⚙️ MANUAL FORM -->
+<h2>⚙️ Manual Add (Fallback)</h2>
+
+<form id="dramaForm">
+
+  <input id="title" placeholder="Title" required />
+  <br /><br />
+
+  <input id="slug" placeholder="Slug" required />
+  <br /><br />
+
+  <input id="year" type="number" placeholder="Year" />
+  <br /><br />
+
+  <input id="poster" placeholder="Poster URL" />
+  <br /><br />
+
+  <input id="backdrop" placeholder="Backdrop URL" />
+  <br /><br />
+
+  <textarea id="overview" placeholder="Overview"></textarea>
+  <br /><br />
+
+  <input id="category" placeholder="Category" />
+  <br /><br />
+
+  <input id="status" placeholder="Status" />
+  <br /><br />
+
+  <input id="tmdb_id" type="number" placeholder="TMDB ID" />
+  <br /><br />
+
+  <input id="original_language" placeholder="Language" />
+  <br /><br />
+
+  <button type="submit">Save Drama</button>
+
+</form>
+
+<p id="statusText"></p>
+
+<script is:inline>
+
+/* =========================
+   GENRE MAP
+========================= */
+const GENRE_MAP = {
+  28: "Action",
+  12: "Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  99: "Documentary",
+  18: "Drama",
+  10751: "Family",
+  14: "Fantasy",
+  36: "History",
+  27: "Horror",
+  10402: "Music",
+  9648: "Mystery",
+  10749: "Romance",
+  878: "Sci-Fi",
+  53: "Thriller",
+  10752: "War",
+  37: "Western"
+};
+
+/* =========================
+   TMDB MAPPER
+========================= */
+function mapTMDB(item) {
+  const title = item.name || item.title;
+
+  return {
+    slug: title
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]/g, ""),
+
+    title,
+    title_th: null,
+
+    year: item.first_air_date
+      ? Number(item.first_air_date.split("-")[0])
+      : item.release_date
+      ? Number(item.release_date.split("-")[0])
+      : null,
+
+    poster: item.poster_path
+      ? "https://image.tmdb.org/t/p/w500" + item.poster_path
+      : null,
+
+    backdrop: item.backdrop_path
+      ? "https://image.tmdb.org/t/p/w1280" + item.backdrop_path
+      : null,
+
+    overview: item.overview || null,
+    overview_th: null,
+
+    // ✅ FIX: string bukan array
+    genre: (item.genre_ids || [])
+      .map(id => GENRE_MAP[id] || "Unknown")
+      .join(", "),
+
+    category: "tmdb",
+    status: "ongoing",
+    tmdb_id: item.id,
+    original_language: item.original_language
+  };
+}
+
+/* =========================
+   SEARCH TMDB
+========================= */
+const searchBtn = document.getElementById("searchBtn");
+const searchInput = document.getElementById("searchInput");
+const results = document.getElementById("results");
+
+searchBtn.addEventListener("click", async () => {
+  const query = searchInput.value;
+
+  const res = await fetch(`/api/search-tmdb?q=${encodeURIComponent(query)}`);
+  const data = await res.json();
+
+  results.innerHTML = "";
+
+  data.results.forEach((item) => {
+    const div = document.createElement("div");
+    div.style.padding = "10px";
+    div.style.border = "1px solid #ccc";
+    div.style.marginBottom = "10px";
+
+    div.innerHTML = `
+      <b>${item.name || item.title}</b>
+      <br/>
+      <small>${item.overview?.slice(0, 100) || ""}...</small>
+      <br/><br/>
+      <button>⬇ Import</button>
+    `;
+
+    div.querySelector("button").addEventListener("click", async () => {
+      await importTMDB(item);
+    });
+
+    results.appendChild(div);
+  });
+});
+
+/* =========================
+   IMPORT + AUTO EPISODES
+========================= */
+async function importTMDB(item) {
+
+  const payload = mapTMDB(item);
+
+  // 1. SAVE DRAMA
+  const res = await fetch("/api/save-drama", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    alert("❌ Save drama failed");
+    return;
+  }
+
+  // 2. AUTO GENERATE EPISODES
+  const epRes = await fetch("/api/generate-episodes", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    tmdb_id: payload.tmdb_id,
+    drama_slug: payload.slug
+  })
+});
+
+  const epData = await epRes.json();
+
+  if (!epData.success) {
+    alert("⚠️ Drama saved but episode failed");
+    return;
+  }
+
+  alert("✅ Imported + Episodes Generated!");
+}
+
+/* =========================
+   MANUAL FORM
+========================= */
+const form = document.getElementById("dramaForm");
+const statusText = document.getElementById("statusText");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    title: document.getElementById("title").value,
+    slug: document.getElementById("slug").value,
+    year: Number(document.getElementById("year").value),
+    poster: document.getElementById("poster").value,
+    backdrop: document.getElementById("backdrop").value,
+    overview: document.getElementById("overview").value,
+    category: document.getElementById("category").value,
+    status: document.getElementById("status").value,
+    tmdb_id: Number(document.getElementById("tmdb_id").value),
+    original_language: document.getElementById("original_language").value
+  };
+
+  const res = await fetch("/api/save-drama", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+
+  statusText.textContent = data.success
+    ? "✅ Saved manually!"
+    : "❌ Error: " + data.error;
+});
+
+</script>
+
+</body>
+</html>

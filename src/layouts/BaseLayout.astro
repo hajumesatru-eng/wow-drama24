@@ -15,29 +15,59 @@ const siteName = 'WOW-DRAMA24';
 <html lang="th">
 
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="google-site-verification" content="qaWTeobMA-0k8QKLHuRQsUa22gYSNePWCIc-HvD1exo" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="google-site-verification"
+    content="qaWTeobMA-0k8QKLHuRQsUa22gYSNePWCIc-HvD1exo"
+  />
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
 
   <title>{title}</title>
-  <meta name="description" content={description} />
 
-  <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#111111" />
+  <meta
+    name="description"
+    content={description}
+  />
 
-  <!-- SEO KEYWORDS (optional, Google mostly ignore but ok) -->
-  <meta name="keywords" content="
-    ดูซีรี่ย์จีน,
-    ซีรี่ย์จีนพากย์ไทย,
-    ดูซีรี่ย์ออนไลน์,
-    ซีรี่ย์จีนใหม่,
-    WOW-DRAMA
-  " />
+  <meta
+    name="robots"
+    content="index, follow"
+  />
+
+  <meta
+    name="theme-color"
+    content="#111111"
+  />
+
+  <!-- SEO KEYWORDS -->
+  <meta
+    name="keywords"
+    content="
+      ดูซีรี่ย์จีน,
+      ซีรี่ย์จีนพากย์ไทย,
+      ดูซีรี่ย์ออนไลน์,
+      ซีรี่ย์จีนใหม่,
+      WOW-DRAMA
+    "
+  />
 
   <!-- CANONICAL -->
-  {canonical && (
-    <link rel="canonical" href={canonical} />
-  )}
+  {
+    canonical && (
+      <link
+        rel="canonical"
+        href={canonical}
+      />
+    )
+  }
 
   <!-- OPEN GRAPH -->
   <meta property="og:locale" content="th_TH" />
@@ -45,23 +75,73 @@ const siteName = 'WOW-DRAMA24';
   <meta property="og:site_name" content={siteName} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
-  <meta property="og:image" content={image || '/og.png'} />
-  {canonical && (
-    <meta property="og:url" content={canonical} />
-  )}
+  <meta property="og:image" content={image || "/og.png"} />
+
+  {
+    canonical && (
+      <meta
+        property="og:url"
+        content={canonical}
+      />
+    )
+  }
 
   <!-- TWITTER -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={title} />
-  <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={image || '/og.png'} />
+  <meta
+    name="twitter:card"
+    content="summary_large_image"
+  />
 
-  <!-- FAVICON -->
+  <meta
+    name="twitter:title"
+    content={title}
+  />
+
+  <meta
+    name="twitter:description"
+    content={description}
+  />
+
+  <meta
+    name="twitter:image"
+    content={image || "/og.png"}
+  />
+
+  <meta
+    name="twitter:site"
+    content="@wowdrama24"
+  />
+
+  <meta
+    name="twitter:creator"
+    content="@wowdrama24"
+  />
+
+  <!-- ICONS -->
   <link rel="icon" href="/favicon.ico" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    rel="apple-touch-icon"
+    href="/favicon.ico"
+  />
+
+  <!-- GOOGLE FONT -->
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  />
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
 </head>
 
 <body>
@@ -70,31 +150,88 @@ const siteName = 'WOW-DRAMA24';
     <slot />
   </main>
 
-  <!-- HISTATS (biarkan jika memang kamu pakai tracking) -->
+  <!-- HISTATS -->
   <script is:inline>
     var _Hasync = _Hasync || [];
-    _Hasync.push(['Histats.start', '1,5011173,4,0,0,0,00010000']);
-    _Hasync.push(['Histats.fasi', '1']);
-    _Hasync.push(['Histats.track_hits', '']);
+
+    _Hasync.push([
+      'Histats.start',
+      '1,5011173,4,0,0,0,00010000'
+    ]);
+
+    _Hasync.push([
+      'Histats.fasi',
+      '1'
+    ]);
+
+    _Hasync.push([
+      'Histats.track_hits',
+      ''
+    ]);
 
     (function () {
+
       var hs = document.createElement('script');
+
       hs.type = 'text/javascript';
       hs.async = true;
-      hs.src = '//s10.histats.com/js15_as.js';
+
+      hs.src =
+        '//s10.histats.com/js15_as.js';
 
       (
         document.getElementsByTagName('head')[0] ||
         document.getElementsByTagName('body')[0]
       ).appendChild(hs);
+
     })();
   </script>
 
   <noscript>
     <a href="/">
-      <img src="//sstatic1.histats.com/0.gif?5011173&101" alt="tracking" />
+      <img
+        src="//sstatic1.histats.com/0.gif?5011173&101"
+        alt="tracking"
+      />
     </a>
   </noscript>
 
 </body>
+
 </html>
+
+<style is:global>
+
+html {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+
+main {
+  width: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+iframe {
+  max-width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+</style>
