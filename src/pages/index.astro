@@ -4,6 +4,8 @@ import Navbar from "../components/Navbar.astro";
 import SearchBox from "../components/SearchBox.astro";
 import DramaCard from "../components/DramaCard.astro";
 import { supabase } from "../lib/supabase.js";
+console.log("URL:", import.meta.env.PUBLIC_SUPABASE_URL);
+console.log("KEY:", !!import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
 
 const PER_PAGE = 30;
 
