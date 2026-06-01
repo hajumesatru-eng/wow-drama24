@@ -25,3 +25,8 @@ pnpm-debug.log*
 .wrangler
 dist
 node_modules
+
+# accidental files
+astro
+npm
+cd-wow-drama24@0.0.1
