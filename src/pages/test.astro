@@ -1,21 +1,5 @@
----
-import { supabase } from "../lib/supabase.js";
-
-const { data, error } = await supabase
-  .from("dramas")
-  .select("*");
----
-
 <html>
 <body>
-<h1>TEST SUPABASE</h1>
-
-<pre>
-{JSON.stringify({
-  count: data?.length,
-  error
-}, null, 2)}
-</pre>
-
+<h1>WOW DRAMA TEST</h1>
 </body>
 </html>
