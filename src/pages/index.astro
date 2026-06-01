@@ -7,25 +7,17 @@ import { supabase } from "../lib/supabase.js";
 
 const PER_PAGE = 30;
 
-// FIX 1: safer query (Cloudflare SSR safe)
 const { data, count, error } = await supabase
   .from("dramas")
   .select("*", { count: "exact" })
   .order("created_at", { ascending: false })
   .range(0, PER_PAGE - 1);
 
-// FIX 2: handle error biar tidak blank page di production
-if (error) {
-  console.error("SUPABASE ERROR:", error);
-}
+console.log("SUPABASE DATA:", data);
+console.log("SUPABASE ERROR:", error);
 
-const latest = data ?? [];
-
-// FIX 3: prevent NaN crash
-const totalPages = count ? Math.ceil(count / PER_PAGE) : 0;
-
-// FIX 4: debug optional (hapus nanti kalau sudah stabil)
-console.log("SUPABASE DATA LENGTH:", latest.length);
+const latest = data || [];
+const totalPages = Math.ceil((count || 0) / PER_PAGE);
 ---
 
 <BaseLayout
