@@ -1,13 +1,21 @@
 ---
-import { supabase } from '../lib/supabase';
+import { supabase } from "../lib/supabase.js";
 
 const { data, error } = await supabase
-  .from('dramas')
-  .select('*');
+  .from("dramas")
+  .select("*");
 ---
 
-<h1>Supabase Test</h1>
+<html>
+<body>
+<h1>TEST SUPABASE</h1>
 
 <pre>
-{JSON.stringify(data, null, 2)}
+{JSON.stringify({
+  count: data?.length,
+  error
+}, null, 2)}
 </pre>
+
+</body>
+</html>
