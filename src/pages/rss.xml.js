@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabase.js";
-
+console.log("DATA SUPABASE:", latest.map(x => x.title));
 const SITE = "https://wow-drama24.pages.dev";
 
 function escapeXml(str = "") {
