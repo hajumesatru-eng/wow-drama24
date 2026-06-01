@@ -10,7 +10,7 @@ const PER_PAGE = 30;
 const { data, count } = await supabase
   .from("dramas")
   .select("*", { count: "exact" })
-  .order("created_at", { ascending: false })
+  .order("id", { ascending: false })
   .range(0, PER_PAGE - 1);
 
 const latest = data || [];
