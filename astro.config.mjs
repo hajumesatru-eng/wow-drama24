@@ -1,10 +1,7 @@
-import { defineConfig } from "astro/config";
-import cloudflare from "@astrojs/cloudflare";
-import sitemap from "@astrojs/sitemap";
+import { defineConfig } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
-  site: "https://wow-drama24.pages.dev",
-  output: "server",
-  adapter: cloudflare(),
-  integrations: [sitemap()]
+  output: 'server',
+  adapter: cloudflare() // Cukup biarkan kosong/standar seperti ini
 });
