@@ -3,18 +3,23 @@ import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  // Ubah output ke 'server' agar Astro tahu ini adalah aplikasi SSR (Dynamic) penuh
   output: 'server', 
   
   adapter: cloudflare({
     imageService: 'passthrough',
-    // Kita matikan opsi bawaan platform proxy jika tidak digunakan untuk menghindari konflik ASSETS
+    
+    // PERBAIKAN UTAMA: Cegah Astro membuat binding otomatis yang memicu error Cloudflare
     platformProxy: {
       enabled: false,
+    },
+    
+    // Matikan pencarian otomatis KV Session bawaan agar tidak memicu error kv_namespaces[0]
+    runtime: {
+      mode: 'complete',
+      binding: false,
     }
   }),
-  integrations: [sitemap()],
   
-  // Tambahkan site URL agar integrasi sitemap Anda tidak lagi memunculkan peringatan [WARN] saat build
-  site: 'https://wow-drama24.pages.dev', 
+  integrations: [sitemap()],
+  site: 'https://wow-drama24.pages.dev', // Pastikan menggunakan domain Anda
 });
