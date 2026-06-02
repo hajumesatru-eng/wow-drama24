@@ -3,5 +3,10 @@ import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
   output: 'server',
-  adapter: cloudflare() // Cukup biarkan kosong/standar seperti ini
+  adapter: cloudflare({
+    // Memaksa Astro untuk TIDAK membuat binding otomatis yang merusak validasi Cloudflare Pages
+    platformProxy: {
+      enabled: false
+    }
+  })
 });
