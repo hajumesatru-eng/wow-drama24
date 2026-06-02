@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && npx wrangler pages deployment create dist/server --compatibility-date=2026-06-02",
+    "build": "astro build && npx wrangler pages deploy dist/client",
     "preview": "astro preview",
     "astro": "astro"
   },
