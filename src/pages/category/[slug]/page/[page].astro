@@ -1,12 +1,11 @@
 ---
 export const prerender = false;
+
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import Navbar from '../../../../components/Navbar.astro';
 import DramaCard from '../../../../components/DramaCard.astro';
 import { supabase } from '../../../../lib/supabase.js';
 import { categories } from '../../../../data/categories';
-
-export const prerender = false;
 
 const PER_PAGE = 10;
 
@@ -81,11 +80,8 @@ const pageDescription =
 <Navbar />
 
 <section class="category-page">
-
   <div class="container">
-
     <div class="category-header">
-
       <h1>
         {category.name}
       </h1>
@@ -99,7 +95,6 @@ const pageDescription =
       <p class="total-count">
         Total: {totalItems} Dramas
       </p>
-
     </div>
 
     {dramasPage.length === 0 ? (
@@ -108,17 +103,14 @@ const pageDescription =
       </div>
     ) : (
       <div class="grid">
-
         {dramasPage.map((drama) => (
           <DramaCard drama={drama} />
         ))}
-
       </div>
     )}
 
     {totalPages > 1 && (
       <div class="pagination">
-
         {hasPrev && (
           <a
             href={`/category/${slug}/page/${prevPage}`}
@@ -140,12 +132,9 @@ const pageDescription =
             Next →
           </a>
         )}
-
       </div>
     )}
-
   </div>
-
 </section>
 
 </BaseLayout>
@@ -221,7 +210,6 @@ const pageDescription =
 
 /* MOBILE */
 @media(max-width:768px){
-
   .category-page{
     padding:15px;
   }
