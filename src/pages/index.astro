@@ -4,6 +4,14 @@ import Navbar from "../components/Navbar.astro";
 import SearchBox from "../components/SearchBox.astro";
 import DramaCard from "../components/DramaCard.astro";
 import { supabase } from "../lib/supabase.js";
+
+// ==========================================
+// FIX CLOUDFLARE CACHE BYPASS (SSR ANTI-CACHE)
+// ==========================================
+Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+Astro.response.headers.set('Pragma', 'no-cache');
+Astro.response.headers.set('Expires', '0');
+
 console.log("URL:", import.meta.env.PUBLIC_SUPABASE_URL);
 console.log("KEY:", !!import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
 

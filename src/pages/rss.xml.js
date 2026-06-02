@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabase.js";
-console.log("DATA SUPABASE:", latest.map(x => x.title));
+
 const SITE = "https://wow-drama24.pages.dev";
 
 function escapeXml(str = "") {
@@ -30,6 +30,9 @@ export async function GET() {
   }
 
   const items = dramas || [];
+
+  // FIX: Memindahkan console.log ke dalam fungsi GET dan menggunakan variabel 'items' yang benar
+  console.log("DATA SUPABASE RSS:", items.map(x => x.title));
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
@@ -75,7 +78,10 @@ ${items
   return new Response(xml, {
     headers: {
       "Content-Type": "application/rss+xml; charset=UTF-8",
-      "Cache-Control": "public, max-age=3600"
+      // FIX: Mengubah cache agar Cloudflare selalu memperbarui RSS saat ada drama baru
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0"
     }
   });
 }
