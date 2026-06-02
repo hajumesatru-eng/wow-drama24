@@ -1,13 +1,11 @@
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  output: 'server',
+  output: 'hybrid', // Menggunakan mode Hybrid (kombinasi Statis & SSR)
   adapter: cloudflare({
     imageService: 'passthrough',
   }),
-  // Paksa Astro untuk mematikan fitur session eksperimental/bawaan jika ada
-  experimental: {
-    session: false
-  }
+  integrations: [sitemap()],
 });
