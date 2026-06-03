@@ -1,6 +1,6 @@
 import { supabase } from "../lib/supabase.js";
 
-const SITE = "https://wow-drama24.pages.dev";
+const SITE = "https://wowdrama24.is-cool.dev";
 
 function escapeXml(str = "") {
   return String(str)

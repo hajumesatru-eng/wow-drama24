@@ -21,5 +21,5 @@ export default defineConfig({
   }),
   
   integrations: [sitemap()],
-  site: 'https://wow-drama24.pages.dev', // Pastikan menggunakan domain Anda
+  site: 'https://wowdrama24.is-cool.dev', // Pastikan menggunakan domain Anda
 });
