@@ -1,6 +1,5 @@
 ---
 ---
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,44 +8,11 @@
   <title>Admin Login</title>
 
   <style>
-    body {
-      font-family: Arial;
-      background: #0f0f0f;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .box {
-      background: #1c1c1c;
-      padding: 25px;
-      border-radius: 10px;
-      width: 320px;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background: red;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    #msg {
-      text-align: center;
-      margin-top: 10px;
-      color: #ff8080;
-    }
+    body { font-family: Arial; background: #0f0f0f; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .box { background: #1c1c1c; padding: 25px; border-radius: 10px; width: 320px; }
+    input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; color: black; }
+    button { width: 100%; padding: 10px; background: red; color: white; border: none; cursor: pointer; }
+    #msg { text-align: center; margin-top: 10px; color: #ff8080; }
   </style>
 </head>
 
@@ -54,41 +20,47 @@
 
   <div class="box">
     <h2>Admin Login</h2>
-
-    <input id="username" placeholder="Username" />
+    <input id="email" type="email" placeholder="Email Admin" />
     <input id="password" type="password" placeholder="Password" />
-
-    <button onclick="login()">Login</button>
-
+    <button id="loginBtn">Login</button>
     <p id="msg"></p>
   </div>
 
   <script>
-async function login() {
-  const usernameEl = document.querySelector("#username");
-  const passwordEl = document.querySelector("#password");
-  const msgEl = document.querySelector("#msg");
+    import { createClient } from "@supabase/supabase-js";
 
-  if (!usernameEl || !passwordEl || !msgEl) return;
+    const supabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+    );
 
-  const username = (usernameEl instanceof HTMLInputElement) ? usernameEl.value : "";
-  const password = (passwordEl instanceof HTMLInputElement) ? passwordEl.value : "";
+    const loginBtn = document.querySelector("#loginBtn");
+    const emailInput = document.querySelector("#email") as HTMLInputElement;
+    const passInput = document.querySelector("#password") as HTMLInputElement;
+    const msgEl = document.querySelector("#msg");
 
-  const res = await fetch("/api/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
-  });
+    loginBtn?.addEventListener("click", async () => {
+      const email = emailInput.value;
+      const password = passInput.value;
 
-  const data = await res.json();
+      if (!email || !password) {
+        if (msgEl) msgEl.textContent = "Email dan Password harus diisi!";
+        return;
+      }
 
-  if (res.ok) {
-    window.location.href = "/admin";
-  } else {
-    msgEl.textContent = data.error || "Login gagal";
-  }
-}
-</script>
+      if (msgEl) msgEl.textContent = "Logging in...";
 
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        if (msgEl) msgEl.textContent = error.message;
+      } else {
+        window.location.href = "/admin";
+      }
+    });
+  </script>
 </body>
 </html>
