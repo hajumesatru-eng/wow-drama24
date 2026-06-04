@@ -47,7 +47,7 @@
         if (msgEl) msgEl.textContent = error.message;
       } else {
         document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=7200; SameSite=Strict`;
-        window.location.href = "/admin";
+        window.location.href = "/admin/dramas";
       }
     });
   </script>

@@ -32,7 +32,6 @@ const { data: dramas } = await supabase
 </head>
 <body>
   <h2>🎬 Admin Dashboard</h2>
-  <a href="/admin/add-drama">+ Add Drama</a>
   {(dramas || []).map((d) => (
     <div class="card">
       <div>
@@ -44,8 +43,8 @@ const { data: dramas } = await supabase
         <button class="toggle" onclick={`toggleStatus(${d.id}, '${d.status ?? "draft"}')`}>
           {d.status === "published" ? "Unpublish" : "Publish"}
         </button>
-        <a class="btn" href={`/admin/drama/${d.id}`}>✏️</button>
-        <button class="btn" onclick={`deleteDrama(${d.id})`}>❌</button>
+        <button class="edit" onclick={`updateEpisode(${d.id})`}>✏️</button>
+        <button class="del" onclick={`deleteDrama(${d.id})`}>❌</button>
       </div>
     </div>
   ))}
