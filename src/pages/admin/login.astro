@@ -4,9 +4,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Login</title>
-
   <style>
     body { font-family: Arial; background: #0f0f0f; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
     .box { background: #1c1c1c; padding: 25px; border-radius: 10px; width: 320px; }
@@ -15,9 +13,7 @@
     #msg { text-align: center; margin-top: 10px; color: #ff8080; }
   </style>
 </head>
-
 <body>
-
   <div class="box">
     <h2>Admin Login</h2>
     <input id="email" type="email" placeholder="Email Admin" />
@@ -28,36 +24,29 @@
 
   <script>
     import { createClient } from "@supabase/supabase-js";
+    const supabase = createClient(import.meta.env.PUBLIC_SUPABASE_URL, import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
 
-    const supabase = createClient(
-      import.meta.env.PUBLIC_SUPABASE_URL,
-      import.meta.env.PUBLIC_SUPABASE_ANON_KEY
-    );
-
-    const loginBtn = document.querySelector("#loginBtn");
-    const emailInput = document.querySelector("#email") as HTMLInputElement;
-    const passInput = document.querySelector("#password") as HTMLInputElement;
+    const btn = document.querySelector("#loginBtn");
+    // Gunakan 'as HTMLInputElement' agar TypeScript tahu ini punya properti .value
+    const emailInput = document.querySelector("#email") as HTMLInputElement | null;
+    const passInput = document.querySelector("#password") as HTMLInputElement | null;
     const msgEl = document.querySelector("#msg");
 
-    loginBtn?.addEventListener("click", async () => {
+    btn?.addEventListener("click", async () => {
+      // Pastikan elemen ada sebelum mengambil .value
+      if (!emailInput || !passInput) return;
+
       const email = emailInput.value;
       const password = passInput.value;
 
-      if (!email || !password) {
-        if (msgEl) msgEl.textContent = "Email dan Password harus diisi!";
-        return;
-      }
-
       if (msgEl) msgEl.textContent = "Logging in...";
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
         if (msgEl) msgEl.textContent = error.message;
       } else {
+        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=7200; SameSite=Strict`;
         window.location.href = "/admin";
       }
     });
