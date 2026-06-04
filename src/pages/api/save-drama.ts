@@ -24,11 +24,15 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 🔥 CEK DUPLICATE TMDB ID
     if (body.tmdb_id) {
-      const { data: existing } = await supabase
+      const { data: existing, error: checkError } = await supabase
         .from("dramas")
         .select("id")
         .eq("tmdb_id", body.tmdb_id)
         .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
 
       if (existing && !body.id) {
         return new Response(
@@ -95,11 +99,14 @@ export const POST: APIRoute = async ({ request }) => {
       }
     );
 
-  } catch (err) {
+  } catch (err: any) {
+    // Menambahkan log detail agar bisa dibaca di Vercel Logs
+    console.error("DEBUG ERROR SUPABASE:", JSON.stringify(err, null, 2));
+    
     return new Response(
       JSON.stringify({
         success: false,
-        error: err instanceof Error ? err.message : "Unknown error"
+        error: err.message || "Unknown error"
       }),
       { status: 500 }
     );
