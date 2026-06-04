@@ -47,20 +47,19 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 🔥 DATA PAYLOAD
     const payload = {
-      slug: body.slug,
-      title: body.title,
-      title_th: body.title_th || null,
-      year: body.year || null,
-      poster: body.poster || null,
-      backdrop: body.backdrop || null,
-      overview: body.overview || null,
-      overview_th: body.overview_th || null,
-      genre,
-      category: body.category || "tmdb",
-      status: body.status || "ongoing",
-      tmdb_id: body.tmdb_id || null,
-      original_language: body.original_language || null
-    };
+  slug: body.slug,
+  title: body.title,
+  title_th: body.title_th || null,
+  year: body.year || null,
+  poster: body.poster || null,
+  backdrop: body.backdrop || null,
+  overview: body.overview || null,
+  overview_th: body.overview_th || null,
+  genre,
+  category: body.category || "tmdb",
+  tmdb_id: body.tmdb_id || null,
+  original_language: body.original_language || null
+};
 
     let result;
 
