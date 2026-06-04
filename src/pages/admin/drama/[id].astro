@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 import { supabase } from "../../../lib/supabase";
+import { categories } from "../../../data/category";
 
 const { id } = Astro.params;
 
@@ -21,16 +22,21 @@ const { data: episodes } = await supabase
   .select("*")
   .eq("drama_slug", drama.slug)
   .order("episode_number", { ascending: true });
+
+// Memisahkan string kategori dari DB menjadi array agar checkbox ter-centang otomatis
+const currentCategories = drama.category ? drama.category.split(",").map(c => c.trim()) : [];
 ---
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Edit Drama - {drama.title}</title>
   <style>
     body { font-family: sans-serif; padding: 20px; background: #111; color: #fff; }
     input, textarea { width: 100%; padding: 8px; margin: 10px 0; color: #000; }
+    .cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 10px 0; background: #222; padding: 15px; border-radius: 5px; }
+    .cat-item { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #fff; }
     .episode-box { background: #222; padding: 10px; margin: 10px 0; border-radius: 5px; }
     button { padding: 10px 20px; cursor: pointer; background: #e50914; color: white; border: none; border-radius: 4px; }
   </style>
@@ -47,8 +53,17 @@ const { data: episodes } = await supabase
   <input id="poster" value={drama.poster || ""} placeholder="Poster URL" />
   <input id="backdrop" value={drama.backdrop || ""} placeholder="Backdrop URL" />
   <textarea id="overview" placeholder="Overview">{drama.overview || ""}</textarea>
-  <input id="category" value={drama.category || ""} placeholder="Category" />
   <input id="status" value={drama.status || ""} placeholder="Status" />
+
+  <h3>Pilih Kategori:</h3>
+  <div class="cat-grid" id="cat-container">
+    {categories.map((cat) => (
+      <label class="cat-item">
+        <input type="checkbox" value={cat.slug} checked={currentCategories.includes(cat.slug)} />
+        {cat.name}
+      </label>
+    ))}
+  </div>
 
   <button onclick="saveDrama()">💾 Save Drama</button>
   <p id="statusText"></p>
@@ -71,6 +86,11 @@ const { data: episodes } = await supabase
 
   <script is:inline define:vars={{ dramaId: id, dramaSlug: drama.slug, dramaTmdbId: drama.tmdb_id }}>
     async function saveDrama() {
+      // Mengumpulkan semua slug yang dicentang
+      const selectedCats = Array.from(document.querySelectorAll('#cat-container input:checked'))
+                                .map(cb => cb.value)
+                                .join(', ');
+
       const payload = {
         id: Number(dramaId),
         title: document.getElementById("title").value,
@@ -81,7 +101,7 @@ const { data: episodes } = await supabase
         poster: document.getElementById("poster").value,
         backdrop: document.getElementById("backdrop").value,
         overview: document.getElementById("overview").value,
-        category: document.getElementById("category").value,
+        category: selectedCats, // Dikirim sebagai string "slug1, slug2"
         status: document.getElementById("status").value
       };
 
