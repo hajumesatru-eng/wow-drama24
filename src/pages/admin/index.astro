@@ -44,8 +44,8 @@ const { data: dramas } = await supabase
         <button class="toggle" onclick={`toggleStatus(${d.id}, '${d.status ?? "draft"}')`}>
           {d.status === "published" ? "Unpublish" : "Publish"}
         </button>
-        <button class="edit" onclick={`/admin/drama/${d.id})`}>✏️</button>
-        <button class="del" onclick={`deleteDrama(${d.id})`}>❌</button>
+        <a class="btn" href={`/admin/drama/${d.id}`}>✏️</button>
+        <button class="btn" onclick={`deleteDrama(${d.id})`}>❌</button>
       </div>
     </div>
   ))}
