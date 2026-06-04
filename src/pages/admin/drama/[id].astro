@@ -1,7 +1,9 @@
 ---
 export const prerender = false;
 import { supabase } from "../../../lib/supabase";
-import { categories } from "../../../data/category";
+
+// Mengambil data kategori
+import { categories } from "../../../data/categories.js";
 
 const { id } = Astro.params;
 
@@ -12,9 +14,7 @@ const { data: drama } = await supabase
   .eq("id", id)
   .single();
 
-if (!drama) {
-  return new Response("Drama not found", { status: 404 });
-}
+if (!drama) return new Response("Drama not found", { status: 404 });
 
 // 2. Ambil data episodes
 const { data: episodes } = await supabase
@@ -23,12 +23,12 @@ const { data: episodes } = await supabase
   .eq("drama_slug", drama.slug)
   .order("episode_number", { ascending: true });
 
-// Memisahkan string kategori dari DB menjadi array agar checkbox ter-centang otomatis
-const currentCategories = drama.category ? drama.category.split(",").map(c => c.trim()) : [];
+// Memisahkan string kategori menjadi array untuk checkbox
+const currentCategories = drama.category ? drama.category.split(",").map((c: any) => c.trim()) : [];
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <title>Edit Drama - {drama.title}</title>
@@ -46,18 +46,12 @@ const currentCategories = drama.category ? drama.category.split(",").map(c => c.
   <h1>✏️ Edit Drama: {drama.title}</h1>
 
   <input id="title" value={drama.title || ""} placeholder="Title" />
-  <input id="title_th" value={drama.title_th || ""} placeholder="Title Thai" />
   <input id="slug" value={drama.slug || ""} placeholder="Slug" />
-  <input id="year" value={drama.year || ""} placeholder="Year" />
-  <input id="genre" value={drama.genre?.join(", ") || ""} placeholder="Genre (comma separated)" />
   <input id="poster" value={drama.poster || ""} placeholder="Poster URL" />
-  <input id="backdrop" value={drama.backdrop || ""} placeholder="Backdrop URL" />
-  <textarea id="overview" placeholder="Overview">{drama.overview || ""}</textarea>
-  <input id="status" value={drama.status || ""} placeholder="Status" />
-
+  
   <h3>Pilih Kategori:</h3>
   <div class="cat-grid" id="cat-container">
-    {categories.map((cat) => (
+    {categories.map((cat: any) => (
       <label class="cat-item">
         <input type="checkbox" value={cat.slug} checked={currentCategories.includes(cat.slug)} />
         {cat.name}
@@ -71,22 +65,19 @@ const currentCategories = drama.category ? drama.category.split(",").map(c => c.
   <hr />
 
   <h2>🎬 Episodes</h2>
-  <button onclick="generateEpisodes()">🔥 Generate From TMDB</button>
-
   <div style="margin-top: 20px;">
     {episodes?.length === 0 && <p>No episodes yet</p>}
-    {episodes?.map((ep) => (
+    {episodes?.map((ep: any) => (
       <div class="episode-box">
-        <h4>Season {ep.season_number || 1} Episode {ep.episode_number}</h4>
+        <h4>Episode {ep.episode_number}</h4>
         <input id={`ep-${ep.id}`} value={ep.video_url || ""} placeholder="Video URL" />
         <button onclick={`saveEpisode(${ep.id})`}>💾 Save Episode</button>
       </div>
     ))}
   </div>
 
-  <script is:inline define:vars={{ dramaId: id, dramaSlug: drama.slug, dramaTmdbId: drama.tmdb_id }}>
+  <script is:inline define:vars={{ dramaId: id }}>
     async function saveDrama() {
-      // Mengumpulkan semua slug yang dicentang
       const selectedCats = Array.from(document.querySelectorAll('#cat-container input:checked'))
                                 .map(cb => cb.value)
                                 .join(', ');
@@ -94,15 +85,9 @@ const currentCategories = drama.category ? drama.category.split(",").map(c => c.
       const payload = {
         id: Number(dramaId),
         title: document.getElementById("title").value,
-        title_th: document.getElementById("title_th").value,
         slug: document.getElementById("slug").value,
-        year: Number(document.getElementById("year").value),
-        genre: document.getElementById("genre").value.split(",").map(g => g.trim()).filter(Boolean),
         poster: document.getElementById("poster").value,
-        backdrop: document.getElementById("backdrop").value,
-        overview: document.getElementById("overview").value,
-        category: selectedCats, // Dikirim sebagai string "slug1, slug2"
-        status: document.getElementById("status").value
+        category: selectedCats
       };
 
       const res = await fetch("/api/save-drama", {
@@ -122,27 +107,8 @@ const currentCategories = drama.category ? drama.category.split(",").map(c => c.
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, video_url })
       });
-
       const data = await res.json();
       alert(data.success ? "Episode saved!" : data.error);
-    };
-
-    window.generateEpisodes = async function () {
-      if (!confirm("Generate all episodes from TMDB?")) return;
-
-      const res = await fetch("/api/save-episode", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ drama_slug: dramaSlug, tmdb_id: dramaTmdbId })
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        alert(`✅ ${data.count} episodes generated`);
-        location.reload();
-      } else {
-        alert(data.error);
-      }
     };
   </script>
 </body>
