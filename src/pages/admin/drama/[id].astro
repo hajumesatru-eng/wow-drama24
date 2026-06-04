@@ -4,7 +4,7 @@ import { supabase } from "../../../lib/supabase";
 
 const { id } = Astro.params;
 
-// ambil drama
+// 1. Ambil data drama
 const { data: drama } = await supabase
   .from("dramas")
   .select("*")
@@ -15,188 +15,115 @@ if (!drama) {
   return new Response("Drama not found", { status: 404 });
 }
 
-// ambil episodes
+// 2. Ambil data episodes
 const { data: episodes } = await supabase
   .from("episodes")
   .select("*")
   .eq("drama_slug", drama.slug)
   .order("episode_number", { ascending: true });
-
-const slug = drama.slug;
 ---
 
-<html>
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <title>Edit Drama - Admin</title>
+  <meta charset="UTF-8" />
+  <title>Edit Drama - {drama.title}</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #111; color: #fff; }
+    input, textarea { width: 100%; padding: 8px; margin: 10px 0; color: #000; }
+    .episode-box { background: #222; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    button { padding: 10px 20px; cursor: pointer; background: #e50914; color: white; border: none; border-radius: 4px; }
+  </style>
 </head>
 
 <body>
+  <h1>✏️ Edit Drama: {drama.title}</h1>
 
-<h1>✏️ Edit Drama</h1>
+  <input id="title" value={drama.title || ""} placeholder="Title" />
+  <input id="title_th" value={drama.title_th || ""} placeholder="Title Thai" />
+  <input id="slug" value={drama.slug || ""} placeholder="Slug" />
+  <input id="year" value={drama.year || ""} placeholder="Year" />
+  <input id="genre" value={drama.genre?.join(", ") || ""} placeholder="Genre (comma separated)" />
+  <input id="poster" value={drama.poster || ""} placeholder="Poster URL" />
+  <input id="backdrop" value={drama.backdrop || ""} placeholder="Backdrop URL" />
+  <textarea id="overview" placeholder="Overview">{drama.overview || ""}</textarea>
+  <input id="category" value={drama.category || ""} placeholder="Category" />
+  <input id="status" value={drama.status || ""} placeholder="Status" />
 
-<!-- DRAMA FORM -->
+  <button onclick="saveDrama()">💾 Save Drama</button>
+  <p id="statusText"></p>
 
-<input id="title" value={drama.title || ""} placeholder="Title (EN / Default)" />
-<br /><br />
+  <hr />
 
-<input id="title_th" value={drama.title_th || ""} placeholder="Title Thai" />
-<br /><br />
+  <h2>🎬 Episodes</h2>
+  <button onclick="generateEpisodes()">🔥 Generate From TMDB</button>
 
-<input id="slug" value={drama.slug || ""} placeholder="Slug" />
-<br /><br />
-
-<input id="year" value={drama.year || ""} placeholder="Year" />
-<br /><br />
-
-<input id="genre" value={drama.genre?.join(", ") || ""} placeholder="Genre (romance, action)" />
-<br /><br />
-
-<input id="poster" value={drama.poster || ""} placeholder="Poster" />
-<br /><br />
-
-<input id="backdrop" value={drama.backdrop || ""} placeholder="Backdrop" />
-<br /><br />
-
-<textarea id="overview" placeholder="Overview">{drama.overview || ""}</textarea>
-<br /><br />
-
-<input id="category" value={drama.category || ""} placeholder="Category" />
-<br /><br />
-
-<input id="status" value={drama.status || ""} placeholder="Status" />
-<br /><br />
-
-<button onclick="saveDrama()">💾 Save Drama</button>
-
-<p id="statusText"></p>
-
-<hr />
-
-<!-- EPISODES -->
-
-<h2>🎬 Episodes</h2>
-
-<button onclick="generateEpisodes()">
-🔥 Generate From TMDB
-</button>
-
-<br /><br />
-{episodes?.length === 0 && <p>No episodes yet</p>}
-
-{episodes?.map((ep) => (
-  <div class="episode-box">
-    <h4>Season {ep.season_number || 1} Episode {ep.episode_number}
-</h4>
-
-    <input
-      id={`ep-${ep.id}`}
-      value={ep.video_url || ""}
-      placeholder="Video URL"
-    />
-
-    <button onclick={`saveEpisode(${ep.id})`}>💾 Save</button>
+  <div style="margin-top: 20px;">
+    {episodes?.length === 0 && <p>No episodes yet</p>}
+    {episodes?.map((ep) => (
+      <div class="episode-box">
+        <h4>Season {ep.season_number || 1} Episode {ep.episode_number}</h4>
+        <input id={`ep-${ep.id}`} value={ep.video_url || ""} placeholder="Video URL" />
+        <button onclick={`saveEpisode(${ep.id})`}>💾 Save Episode</button>
+      </div>
+    ))}
   </div>
-))}
 
+  <script is:inline define:vars={{ dramaId: id, dramaSlug: drama.slug, dramaTmdbId: drama.tmdb_id }}>
+    async function saveDrama() {
+      const payload = {
+        id: Number(dramaId),
+        title: document.getElementById("title").value,
+        title_th: document.getElementById("title_th").value,
+        slug: document.getElementById("slug").value,
+        year: Number(document.getElementById("year").value),
+        genre: document.getElementById("genre").value.split(",").map(g => g.trim()).filter(Boolean),
+        poster: document.getElementById("poster").value,
+        backdrop: document.getElementById("backdrop").value,
+        overview: document.getElementById("overview").value,
+        category: document.getElementById("category").value,
+        status: document.getElementById("status").value
+      };
 
-<!-- SCRIPTS -->
+      const res = await fetch("/api/save-drama", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-<script is:inline>
+      const data = await res.json();
+      document.getElementById("statusText").innerText = data.success ? "✅ Saved!" : "❌ Error: " + data.error;
+    }
 
-async function saveDrama() {
+    window.saveEpisode = async function (id) {
+      const video_url = document.getElementById(`ep-${id}`).value;
+      const res = await fetch("/api/update-episode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, video_url })
+      });
 
-  const payload = {
-    id: Number({id}),
+      const data = await res.json();
+      alert(data.success ? "Episode saved!" : data.error);
+    };
 
-    title: document.getElementById("title").value,
-    title_th: document.getElementById("title_th").value,
+    window.generateEpisodes = async function () {
+      if (!confirm("Generate all episodes from TMDB?")) return;
 
-    slug: document.getElementById("slug").value,
-    year: Number(document.getElementById("year").value),
+      const res = await fetch("/api/save-episode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ drama_slug: dramaSlug, tmdb_id: dramaTmdbId })
+      });
 
-    genre: document.getElementById("genre")
-      .value
-      ?.split(",")
-      .map(g => g.trim())
-      .filter(Boolean) || [],
-
-    poster: document.getElementById("poster").value,
-    backdrop: document.getElementById("backdrop").value,
-
-    overview: document.getElementById("overview").value,
-
-    category: document.getElementById("category").value,
-    status: document.getElementById("status").value
-  };
-
-  const res = await fetch("/api/save-drama", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  });
-
-  const data = await res.json();
-
-  document.getElementById("statusText").innerText =
-    data.success ? "✅ Saved!" : "❌ Error: " + data.error;
-}
-
-
-// SAVE EPISODE
-window.saveEpisode = async function (id) {
-
-  const video_url = document.getElementById(`ep-${id}`).value;
-
-  const res = await fetch("/api/update-episode", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      id,
-      video_url
-    })
-  });
-
-  const data = await res.json();
-
-  alert(data.success ? "Episode saved!" : data.error);
-};
-
-
-// ADD EPISODE
-const dramaSlug = "{drama.slug}";
-const dramaTmdbId = Number("{drama.tmdb_id}");
-window.generateEpisodes = async function () {
-
-  if (!confirm("Generate all episodes from TMDB?")) {
-    return;
-  }
-
-  const res = await fetch("/api/save-episode", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-     body: JSON.stringify({
-     drama_slug: dramaSlug,
-     tmdb_id: dramaTmdbId
-})
-  });
-
-  const data = await res.json();
-
-  if (data.success) {
-    alert(`✅ ${data.count} episodes generated`);
-    location.reload();
-  } else {
-    alert(data.error);
-  }
-};
-
-</script>
-
+      const data = await res.json();
+      if (data.success) {
+        alert(`✅ ${data.count} episodes generated`);
+        location.reload();
+      } else {
+        alert(data.error);
+      }
+    };
+  </script>
 </body>
 </html>
