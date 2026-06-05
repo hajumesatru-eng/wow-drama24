@@ -3,13 +3,13 @@ export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Navbar from '../../../components/Navbar.astro';
 import DramaCard from '../../../components/DramaCard.astro';
-
 import { supabase } from '../../../lib/supabase';
 import { categories } from '../../../data/categories.js';
 
-const slug = Astro.params.slug;
+// Pastikan file ini berada di folder [slug] agar params ini bekerja
+const { slug } = Astro.params;
 
-// Cari kategori dari URL, fallback ke kategori pertama jika tidak ditemukan
+// Cari kategori
 const category = categories.find((c) => c.slug === slug) || categories[0];
 
 // Ambil semua drama
@@ -20,15 +20,13 @@ const { data } = await supabase
 
 const dramas = data || [];
 
-// Logika Filter yang diperbarui
 const filteredDramas = dramas.filter((drama) => {
-  if (category.slug === 'the-series-all') {
-    return true;
-  }
+  if (category.slug === 'the-series-all') return true;
 
-  // Memastikan kolom 'categories' dipecah menjadi array dan dibersihkan dari spasi
-  const dramaCategories = drama.categories 
-    ? drama.categories.split(',').map((c: string) => c.trim()) 
+  // PERBAIKAN: Gunakan 'drama.category' (sesuai nama kolom di DB kamu)
+  // bukan 'drama.categories'
+  const dramaCategories = drama.category 
+    ? drama.category.split(',').map((c: string) => c.trim()) 
     : [];
 
   return dramaCategories.includes(category.slug);
