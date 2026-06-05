@@ -27,15 +27,21 @@
       <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
         <h2 class="text-xl font-bold mb-6">⚙️ Add Manual</h2>
         <form id="dramaForm" class="space-y-4">
-          <input id="title" class="w-full border p-3 rounded-xl" placeholder="Title" required />
-          <input id="slug" class="w-full border p-3 rounded-xl" placeholder="Slug (ex: drama-korea-baru)" required />
-          <div class="grid grid-cols-2 gap-2">
-             <input id="year" type="number" class="border p-3 rounded-xl" placeholder="Year" />
-             <input id="status" class="border p-3 rounded-xl" placeholder="Status" />
-          </div>
-          <textarea id="overview" class="w-full border p-3 rounded-xl h-24" placeholder="Overview"></textarea>
-          <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition">Save Drama</button>
-        </form>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <input id="title" class="w-full border p-3 rounded-xl" placeholder="Title" required />
+    <input id="slug" class="w-full border p-3 rounded-xl" placeholder="Slug" required />
+    <input id="year" type="number" class="border p-3 rounded-xl" placeholder="Year" />
+    <input id="status" class="border p-3 rounded-xl" placeholder="Status" />
+    <input id="poster" class="border p-3 rounded-xl" placeholder="Poster URL" />
+    <input id="backdrop" class="border p-3 rounded-xl" placeholder="Backdrop URL" />
+    <input id="category" class="border p-3 rounded-xl" placeholder="Category" />
+    <input id="tmdb_id" type="number" class="border p-3 rounded-xl" placeholder="TMDB ID" />
+  </div>
+  <input id="original_language" class="w-full border p-3 rounded-xl" placeholder="Language (ex: ko, zh)" />
+  <textarea id="overview" class="w-full border p-3 rounded-xl h-24" placeholder="Overview"></textarea>
+  
+  <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition">Save Drama</button>
+</form>
         <p id="statusText" class="mt-4 text-center font-medium text-sm"></p>
       </div>
     </div>
