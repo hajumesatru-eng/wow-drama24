@@ -15,91 +15,103 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       
       <div class="lg:col-span-2 bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-6 flex items-center gap-2">🔍 Search TMDB</h2>
+        <h2 class="text-xl font-bold mb-6">🔍 Search TMDB</h2>
         <div class="flex gap-2 mb-6">
           <input id="searchInput" class="flex-1 border border-slate-300 rounded-xl px-5 py-3 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Cari judul drama/movie..." />
-          <button id="searchBtn" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">Cari</button>
+          <button id="searchBtn" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition">Cari</button>
         </div>
-        <div id="results" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            </div>
+        <div id="results" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
       </div>
 
       <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
         <h2 class="text-xl font-bold mb-6">⚙️ Add Manual</h2>
         <form id="dramaForm" class="space-y-4">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <input id="title" class="w-full border p-3 rounded-xl" placeholder="Title" required />
-    <input id="slug" class="w-full border p-3 rounded-xl" placeholder="Slug" required />
-    <input id="year" type="number" class="border p-3 rounded-xl" placeholder="Year" />
-    <input id="status" class="border p-3 rounded-xl" placeholder="Status" />
-    <input id="poster" class="border p-3 rounded-xl" placeholder="Poster URL" />
-    <input id="backdrop" class="border p-3 rounded-xl" placeholder="Backdrop URL" />
-    <input id="category" class="border p-3 rounded-xl" placeholder="Category" />
-    <input id="tmdb_id" type="number" class="border p-3 rounded-xl" placeholder="TMDB ID" />
-  </div>
-  <input id="original_language" class="w-full border p-3 rounded-xl" placeholder="Language (ex: ko, zh)" />
-  <textarea id="overview" class="w-full border p-3 rounded-xl h-24" placeholder="Overview"></textarea>
-  
-  <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition">Save Drama</button>
-</form>
+          <input id="title" class="w-full border p-3 rounded-xl" placeholder="Title" required />
+          <input id="slug" class="w-full border p-3 rounded-xl" placeholder="Slug" required />
+          <div class="grid grid-cols-2 gap-2">
+            <input id="year" type="number" class="border p-3 rounded-xl" placeholder="Year" />
+            <input id="status" class="border p-3 rounded-xl" placeholder="Status" />
+          </div>
+          <input id="poster" class="w-full border p-3 rounded-xl" placeholder="Poster URL" />
+          <input id="backdrop" class="w-full border p-3 rounded-xl" placeholder="Backdrop URL" />
+          <input id="category" class="w-full border p-3 rounded-xl" placeholder="Category" />
+          <input id="tmdb_id" type="number" class="w-full border p-3 rounded-xl" placeholder="TMDB ID" />
+          <input id="original_language" class="w-full border p-3 rounded-xl" placeholder="Language (ex: ko, zh)" />
+          <textarea id="overview" class="w-full border p-3 rounded-xl h-24" placeholder="Overview"></textarea>
+          
+          <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition">Save Drama</button>
+        </form>
         <p id="statusText" class="mt-4 text-center font-medium text-sm"></p>
       </div>
     </div>
   </div>
 
   <script is:inline>
-    const GENRE_MAP = { 28: "Action", 12: "Adventure", 35: "Comedy", 18: "Drama", 27: "Horror", 9648: "Mystery", 10749: "Romance" };
+    const GENRE_MAP = { 28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime", 99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Sci-Fi", 53: "Thriller", 10752: "War", 37: "Western" };
 
     function mapTMDB(item) {
       const title = item.name || item.title;
       return {
         slug: title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, ""),
         title,
-        year: item.first_air_date ? Number(item.first_air_date.split("-")[0]) : null,
+        year: item.first_air_date ? Number(item.first_air_date.split("-")[0]) : (item.release_date ? Number(item.release_date.split("-")[0]) : null),
         poster: item.poster_path ? "https://image.tmdb.org/t/p/w500" + item.poster_path : null,
+        backdrop: item.backdrop_path ? "https://image.tmdb.org/t/p/w1280" + item.backdrop_path : null,
         overview: item.overview || null,
         genre: (item.genre_ids || []).map(id => GENRE_MAP[id] || "Unknown").join(", "),
         category: "tmdb",
-        status: "published",
+        status: "ongoing",
         tmdb_id: item.id,
         original_language: item.original_language
       };
     }
 
+    // SEARCH TMDB
     document.getElementById("searchBtn").addEventListener("click", async () => {
       const query = document.getElementById("searchInput").value;
       const res = await fetch(`/api/search-tmdb?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       const results = document.getElementById("results");
       results.innerHTML = "";
-
       data.results.forEach((item) => {
         const div = document.createElement("div");
         div.className = "p-4 border rounded-2xl hover:border-indigo-300 transition bg-slate-50";
-        div.innerHTML = `
-          <h3 class="font-bold text-sm mb-1">${item.name || item.title}</h3>
-          <button class="bg-slate-800 text-white text-xs px-4 py-2 rounded-lg mt-2 w-full hover:bg-slate-900">Import Data</button>
-        `;
+        div.innerHTML = `<h3 class="font-bold text-sm mb-2">${item.name || item.title}</h3><button class="bg-slate-800 text-white text-xs px-4 py-2 rounded-lg w-full">Import Data</button>`;
         div.querySelector("button").onclick = () => importTMDB(item);
         results.appendChild(div);
       });
     });
 
+    // IMPORT + GENERATE EPISODES
     async function importTMDB(item) {
       const payload = mapTMDB(item);
-      const res = await fetch("/api/save-drama", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      alert((await res.json()).success ? "✅ Berhasil Diimport!" : "❌ Gagal Import");
+      const res = await fetch("/api/save-drama", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (!data.success) return alert("❌ Save failed");
+
+      const epRes = await fetch("/api/generate-episodes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tmdb_id: payload.tmdb_id, drama_slug: payload.slug }) });
+      alert((await epRes.json()).success ? "✅ Imported + Episodes Generated!" : "⚠️ Drama saved but episode failed");
     }
 
-    document.getElementById("dramaForm").onsubmit = async (e) => {
+    // MANUAL FORM
+    document.getElementById("dramaForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      // Logic save manual di sini...
-      alert("Saving...");
-    };
+      const payload = {
+        title: document.getElementById("title").value,
+        slug: document.getElementById("slug").value,
+        year: Number(document.getElementById("year").value),
+        poster: document.getElementById("poster").value,
+        backdrop: document.getElementById("backdrop").value,
+        overview: document.getElementById("overview").value,
+        category: document.getElementById("category").value,
+        status: document.getElementById("status").value,
+        tmdb_id: Number(document.getElementById("tmdb_id").value),
+        original_language: document.getElementById("original_language").value
+      };
+      const res = await fetch("/api/save-drama", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      document.getElementById("statusText").textContent = data.success ? "✅ Saved manually!" : "❌ Error";
+    });
   </script>
 </body>
 </html>
