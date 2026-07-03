@@ -60,7 +60,20 @@ const firstEpisode = episodes?.[0]?.video_url ?? "";
 <Navbar />
 
 <div class="container">
+<!-- AD TOP (UNCHANGED) -->
+  <div class="ad-top desktop-only">
+    <script is:inline>
+      atOptions = {
+        'key' : '2d751854ce36e13fefddaa58f93251e2',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
 
+    <script is:inline src="https://buffcasualwhine.com/2d751854ce36e13fefddaa58f93251e2/invoke.js"></script>
+  </div>
   <!-- BACKDROP (NO CHANGE) -->
   <div class="backdrop">
     <img src={drama.backdrop} alt={drama.title} />
