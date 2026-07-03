@@ -78,7 +78,20 @@ const firstEpisode = episodes?.[0]?.video_url ?? "";
   <div class="backdrop">
     <img src={drama.backdrop} alt={drama.title} />
   </div>
+<!-- 🔥 BOTTOM ADS (NOW CENTER UNDER PLAYER) -->
+<div class="bottom-ad-center">
+  <script is:inline>
+    atOptions = {
+      'key' : 'ee6fbbaee01d7a12aeeb5d58f3126e1f',
+      'format' : 'iframe',
+      'height' : 60,
+      'width' : 468,
+      'params' : {}
+    };
+  </script>
 
+  <script is:inline src="https://buffcasualwhine.com/ee6fbbaee01d7a12aeeb5d58f3126e1f/invoke.js"></script>
+</div>
   <!-- INFO (NO CHANGE STRUCTURE) -->
   <div class="info">
     <img class="poster" src={drama.poster} alt={drama.title} />
